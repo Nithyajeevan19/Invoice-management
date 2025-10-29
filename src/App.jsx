@@ -60,10 +60,7 @@ const App = () => {
                 </p>
               </div>
               <div className="flex items-center space-x-4">
-                <div className="text-right">
-                  <p className="text-xs text-gray-500">Powered by</p>
-                  <p className="text-sm font-semibold text-indigo-600">Google Gemini AI</p>
-                </div>
+                <h1 className="text-lg font-medium text-gray-700">SWIPE</h1>
               </div>
             </div>
           </div>
@@ -113,8 +110,8 @@ const App = () => {
         {/* Footer */}
         <footer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-12">
           <div className="text-center text-sm text-gray-600">
-            <p>Built with React, Redux Toolkit, and Google Gemini AI</p>
-            <p className="mt-1">© 2025 Invoice Management System - Swipe Assignment</p>
+            <p>Done By Nithyajeevan</p>
+            <p className="mt-1">© 2025 Invoice Management System</p>
           </div>
         </footer>
       </div>
