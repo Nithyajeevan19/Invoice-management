@@ -110,79 +110,101 @@ export const extractInvoiceData = async (fileContent, fileType, fileData = null)
   try {
     const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     const prompt = `
-You are an expert invoice data extraction system. Your task is to extract invoice information from the provided content.
+  You are an expert invoice data extraction system. Your task is to extract invoice information from the provided content.
 
-CRITICAL INSTRUCTIONS:
-1. CAREFULLY analyze the provided content for any invoice-related information
-2. Look for numbers, dates, product details, customer information
-3. If you find ANY valid data, include it in the response
-4. Extract even partial information if complete data is not available
-5. Numbers can appear in various formats: 1000, 1,000, 1.000, ₹1000
-6. Dates can be in formats like: 2023-10-29, 29/10/2023, Oct 29 2023
+  CRITICAL: SEARCH THE ENTIRE DOCUMENT FOR EMAIL AND GSTIN - DO NOT MISS THEM!
 
-Extract the following information in JSON format:
+  CUSTOMER INFORMATION - HIGHEST PRIORITY:
 
-{
-  "invoices": [
-    {
-      "serialNumber": "string",
-      "customerName": "string",
-      "date": "YYYY-MM-DD",
-      "totalAmount": number,
-      "taxAmount": number,
-      "products": [
-        {
-          "name": "string", 
-          "quantity": number,
-          "unitPrice": number,
-          "tax": number,
-          "amount": number
-        }
-      ]
+  EMAIL EXTRACTION (MANDATORY):
+  - Search for EXACT pattern: "Email:" or "Email :" or "email:" followed by any text containing @
+  - Look for: Swipe@gmail.com, admin@company.com, any@domain pattern
+  - Search in ALL sections: header, company info, contact details
+  - Examples to find: Swipe@gmail.com, support@swipe.com, contact@test.com
+  - If found: Extract the EXACT email address (do not modify)
+  - If NOT found: Set email to empty string ""
+
+  GSTIN EXTRACTION (MANDATORY):
+  - Search for EXACT pattern: "GSTIN" or "GST No" or "GST:" followed by 15 character code
+  - Format: Two digits + Five letters + Four digits + One letter + Three alphanumeric (e.g., 29AABCT1332L000)
+  - Search in ALL sections: company header, tax info
+  - Look for: 29AABCT1332L000 or similar 15-char code
+  - If found: Extract the EXACT GSTIN number
+  - If NOT found: Set gstin to empty string ""
+
+  PHONE EXTRACTION:
+  - Search for: Mobile:, Phone:, +91, 9999999999 format
+  - If found: Include it
+  - If NOT found: Set phoneNumber to empty string ""
+
+  Extract in JSON format:
+
+  {
+    "invoices": [
+      {
+        "serialNumber": "string",
+        "customerName": "string",
+        "date": "YYYY-MM-DD",
+        "totalAmount": number,
+        "taxAmount": number,
+        "products": [
+          {
+            "name": "string", 
+            "quantity": number,
+            "unitPrice": number,
+            "tax": number,
+            "amount": number
+          }
+        ]
+      }
+    ],
+    "products": [
+      {
+        "name": "string",
+        "quantity": number,
+        "unitPrice": number,
+        "tax": number,
+        "priceWithTax": number,
+        "discount": 0
+      }
+    ],
+    "customers": [
+      {
+        "name": "string",
+        "phoneNumber": "string",
+        "email": "string",
+        "gstin": "string",
+        "address": "string",
+        "totalPurchaseAmount": number
+      }
+    ],
+    "missingFields": {
+      "invoices": [],
+      "products": [],
+      "customers": []
     }
-  ],
-  "products": [
-    {
-      "name": "string",
-      "quantity": number,
-      "unitPrice": number,
-      "tax": number,
-      "priceWithTax": number,
-      "discount": 0
-    }
-  ],
-  "customers": [
-    {
-      "name": "string",
-      "phoneNumber": "string",
-      "email": "string",
-      "gstin": "string",
-      "address": "string",
-      "totalPurchaseAmount": number
-    }
-  ],
-  "missingFields": {
-    "invoices": ["list of missing required fields"],
-    "products": ["list of missing required fields"],
-    "customers": ["list of missing required fields"]
   }
-}
 
-IMPORTANT RULES:
-1. Extract ONLY actual data from the input - do NOT generate dummy or example data
-2. If a field cannot be found, use null for numbers and empty string for text
-3. Add missing required fields to missingFields array
-4. All amounts must be numbers (not strings)
-5. All dates must be in YYYY-MM-DD format
-6. Return ONLY valid JSON, no markdown
-7. Do NOT make up data or use placeholders
+  IMPORTANT RULES:
+  1. Extract ONLY actual data - do NOT generate dummy data
+  2. Use empty string "" for any field not found (NOT null)
+  3. ALWAYS include all customer fields in response
+  4. All amounts must be numbers
+  5. All dates must be in YYYY-MM-DD format
+  6. Return ONLY valid JSON
 
-File Type: ${fileType}
+  SEARCH STRATEGY:
+  1. First: Find email by looking for @ symbol pattern
+  2. Second: Find GSTIN by looking for 15-character alphanumeric code
+  3. Third: Extract other invoice data
+  4. Fourth: Extract product data
 
-Data:
-${fileContent}
-`;
+  File Type: ${fileType}
 
+  Data:
+  ${fileContent}
+    `;
+    
     let result;
     
     console.log('📄 Extracting data from file:', {
