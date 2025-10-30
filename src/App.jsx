@@ -2,22 +2,26 @@ import { useState } from 'react';
 import { Provider } from 'react-redux';
 import { store } from './redux/store';
 import { Toaster } from 'react-hot-toast';
-import { FileText, Package, Users, BarChart3 } from 'lucide-react';
 import FileUpload from './components/FileUpload';
 import InvoicesTab from './components/InvoicesTab';
 import ProductsTab from './components/ProductsTab';
 import CustomersTab from './components/CustomersTab';
+import { BarChart3, FileText, Package, Users } from 'lucide-react';
+import AnalyticsTab from './components/AnalyticsTab';
+
+
 import './index.css';
 const App = () => {
   const [activeTab, setActiveTab] = useState('upload');
 
   
   const tabs = [
-    { id: 'upload', label: 'Upload Files', icon: FileText },
-    { id: 'invoices', label: 'Invoices', icon: BarChart3 },
-    { id: 'products', label: 'Products', icon: Package },
-    { id: 'customers', label: 'Customers', icon: Users },
-  ];
+  { id: 'upload', label: 'Upload Files', icon: FileText },
+  { id: 'invoices', label: 'Invoices', icon: BarChart3 },
+  { id: 'products', label: 'Products', icon: Package },
+  { id: 'customers', label: 'Customers', icon: Users },
+  { id: 'analytics', label: 'Analytics', icon: BarChart3 }, // NEW
+];
 
   return (
     <Provider store={store}>
@@ -103,6 +107,7 @@ const App = () => {
               {activeTab === 'invoices' && <InvoicesTab />}
               {activeTab === 'products' && <ProductsTab />}
               {activeTab === 'customers' && <CustomersTab />}
+              {activeTab === 'analytics' && <AnalyticsTab />}  
             </div>
           </div>
         </div>

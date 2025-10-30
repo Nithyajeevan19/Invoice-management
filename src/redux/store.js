@@ -4,13 +4,14 @@ import productReducer from './slices/productSlice';
 import customerReducer from './slices/customerSlice';
 import fileReducer from './slices/fileSlice';
 import syncMiddleware from './middleware/syncMiddleware';
-
+import filterReducer from './slices/filterSlice'; 
 export const store = configureStore({
   reducer: {
     invoices: invoiceReducer,
     products: productReducer,
     customers: customerReducer,
     files: fileReducer,
+    filters: filterReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
