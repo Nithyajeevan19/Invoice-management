@@ -19,6 +19,15 @@ export const addInvoicesAsync = createAsyncThunk(
         id: invoice.id || uuidv4(),
         createdAt: new Date().toISOString(),
         validationErrors: invoice.validationErrors || [],
+        status: invoice.status || 'draft',
+        taxBreakdown: invoice.taxBreakdown || {
+          cgst: 0,
+          sgst: 0,
+          igst: 0,
+          totalTax: 0,
+        },
+        sellerState: invoice.sellerState || 'KARNATAKA',
+        buyerState: invoice.buyerState || '',
       }));
       return processedInvoices;
     } catch (error) {
@@ -36,10 +45,11 @@ const invoiceSlice = createSlice({
         ...action.payload,
         id: action.payload.id || uuidv4(),
         createdAt: new Date().toISOString(),
+        status: action.payload.status || 'draft', // ADD STATUS
       });
       state.lastUpdated = new Date().toISOString();
     },
-    
+
     updateInvoice: (state, action) => {
       const index = state.invoices.findIndex(inv => inv.id === action.payload.id);
       if (index !== -1) {
@@ -47,12 +57,20 @@ const invoiceSlice = createSlice({
         state.lastUpdated = new Date().toISOString();
       }
     },
-    
+
+    updateInvoiceStatus: (state, action) => {
+      const invoice = state.invoices.find(inv => inv.id === action.payload.id);
+      if (invoice) {
+        invoice.status = action.payload.status;
+        state.lastUpdated = new Date().toISOString();
+      }
+    },
+
     deleteInvoice: (state, action) => {
       state.invoices = state.invoices.filter(inv => inv.id !== action.payload);
       state.lastUpdated = new Date().toISOString();
     },
-    
+
     updateInvoiceProducts: (state, action) => {
       const { invoiceId, products } = action.payload;
       const invoice = state.invoices.find(inv => inv.id === invoiceId);
@@ -63,7 +81,7 @@ const invoiceSlice = createSlice({
         state.lastUpdated = new Date().toISOString();
       }
     },
-    
+
     updateInvoiceCustomer: (state, action) => {
       const { customerId, customerName } = action.payload;
       state.invoices.forEach(invoice => {
@@ -73,13 +91,13 @@ const invoiceSlice = createSlice({
       });
       state.lastUpdated = new Date().toISOString();
     },
-    
+
     clearInvoices: (state) => {
       state.invoices = [];
       state.error = null;
       state.lastUpdated = new Date().toISOString();
     },
-    
+
     setValidationErrors: (state, action) => {
       const { invoiceId, errors } = action.payload;
       const invoice = state.invoices.find(inv => inv.id === invoiceId);
@@ -88,7 +106,7 @@ const invoiceSlice = createSlice({
       }
     },
   },
-  
+
   extraReducers: (builder) => {
     builder
       .addCase(addInvoicesAsync.pending, (state) => {
@@ -114,6 +132,7 @@ export const {
   updateInvoiceProducts,
   updateInvoiceCustomer,
   clearInvoices,
+  updateInvoiceStatus,
   setValidationErrors,
 } = invoiceSlice.actions;
 

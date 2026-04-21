@@ -10,12 +10,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^5.2.2",
+    "@react-pdf/renderer": "^4.3.1",
     "@reduxjs/toolkit": "^2.9.2",
     "date-fns": "^4.1.0",
+    "file-saver": "^2.0.5",
     "lucide-react": "^0.548.0",
     "pdf-parse": "^2.4.5",
+    "qrcode.react": "^4.2.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-hook-form": "^7.65.0",

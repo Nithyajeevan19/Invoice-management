@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { Trash2, Edit2, Save, X, AlertCircle } from 'lucide-react';
 import { updateCustomer, deleteCustomer } from '../redux/slices/customerSlice';
 import toast from 'react-hot-toast';
+import { exportToExcel } from '../utils/exportToExcel';
+import { Download } from 'lucide-react';
 
 const CustomersTab = () => {
   const dispatch = useDispatch();
@@ -60,6 +62,14 @@ const CustomersTab = () => {
 
   return (
     <div className="overflow-x-auto">
+      <button
+        onClick={() => exportToExcel(customers, "customers_export.xlsx", "Customers")}
+        className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 ml-2"
+      >
+        <Download className="h-5 w-5 mr-1" />
+        Export to Excel
+      </button>
+
       <table className="min-w-full bg-white border border-gray-200 rounded-lg">
         <thead className="bg-gray-100">
           <tr>

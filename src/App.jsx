@@ -8,8 +8,10 @@ import ProductsTab from './components/ProductsTab';
 import CustomersTab from './components/CustomersTab';
 import { BarChart3, FileText, Package, Users } from 'lucide-react';
 import AnalyticsTab from './components/AnalyticsTab';
-
-
+import PaymentsTab from './components/PaymentsTab';
+import { DollarSign } from 'lucide-react'; // Add to existing imports
+import AIInsights from './components/AIInsights';
+import { Brain } from 'lucide-react'; // Add to existing imports
 import './index.css';
 const App = () => {
   const [activeTab, setActiveTab] = useState('upload');
@@ -20,7 +22,9 @@ const App = () => {
   { id: 'invoices', label: 'Invoices', icon: BarChart3 },
   { id: 'products', label: 'Products', icon: Package },
   { id: 'customers', label: 'Customers', icon: Users },
-  { id: 'analytics', label: 'Analytics', icon: BarChart3 }, // NEW
+  { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+  { id: 'payments', label: 'Payments', icon: DollarSign },
+  { id: 'ai-insights', label: 'AI Insights', icon: Brain }, // NEW
 ];
 
   return (
@@ -108,6 +112,8 @@ const App = () => {
               {activeTab === 'products' && <ProductsTab />}
               {activeTab === 'customers' && <CustomersTab />}
               {activeTab === 'analytics' && <AnalyticsTab />}  
+              {activeTab === 'payments' && <PaymentsTab />}
+              {activeTab === 'ai-insights' && <AIInsights />}
             </div>
           </div>
         </div>

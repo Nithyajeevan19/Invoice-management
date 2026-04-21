@@ -7,6 +7,7 @@ const initialState = {
     maxAmount: '',
     startDate: '',
     endDate: '',
+    status: '', // ADD THIS
   },
   productFilters: {
     searchTerm: '',
@@ -35,6 +36,9 @@ const filterSlice = createSlice({
     setInvoiceDateRange: (state, action) => {
       state.invoiceFilters.startDate = action.payload.start;
       state.invoiceFilters.endDate = action.payload.end;
+    },
+    setInvoiceStatusFilter: (state, action) => {
+      state.invoiceFilters.status = action.payload;
     },
     resetInvoiceFilters: (state) => {
       state.invoiceFilters = initialState.invoiceFilters;
@@ -70,6 +74,7 @@ export const {
   setInvoiceSearchTerm,
   setInvoiceAmountRange,
   setInvoiceDateRange,
+  setInvoiceStatusFilter, // ADD THIS
   resetInvoiceFilters,
   setProductSearchTerm,
   setProductPriceRange,
