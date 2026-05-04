@@ -149,7 +149,17 @@ const FileUpload = () => {
 
     } catch (error) {
       console.error('Upload error:', error);
-      toast.error(`Upload failed: ${error.message}`);
+      
+      // Provide more helpful error messages
+      let errorMessage = error.message;
+      
+      if (error.message?.includes('high demand') || error.message?.includes('503')) {
+        errorMessage = '⚠️ AI service is busy right now. Please wait a moment and try again. The system will automatically retry several times.';
+      } else if (error.message?.includes('API') || error.message?.includes('generative')) {
+        errorMessage = '⚠️ Unable to process file. Check your internet connection and API key configuration.';
+      }
+      
+      toast.error(`Upload failed: ${errorMessage}`);
     } finally {
       setProcessingState(false);
       setProgressState(0);

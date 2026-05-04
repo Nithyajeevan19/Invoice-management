@@ -31,32 +31,33 @@ export const processFile = async (file, onProgress) => {
         throw new Error(`Unsupported file type: ${file.type}`);
     }
     
-    onProgress?.({ status: 'extracting', progress: 50, message: 'Extracting data with AI...' });
-    
-    // For visual files (PDF/images), we'll use vision API
-    const shouldUseVisionAPI = fileType === 'pdf' || fileType === 'image';
-    
-    // Validate that we have the required data
-    if (shouldUseVisionAPI && !parsedData.base64Data) {
-      throw new Error(`Missing base64 data for ${fileType} file`);
-    }
+    onProgress?.({ status: 'extracting', progress: 50, message: 'Extracting data with AI (retrying if needed)...' });
     
     console.log('🔄 Processing:', {
       fileType,
       fileName: file.name,
       size: file.size,
-      useVisionAPI: shouldUseVisionAPI,
       hasText: !!parsedData.textContent,
+      textLength: parsedData.textContent?.length || 0,
       hasBase64: !!parsedData.base64Data,
       base64Length: parsedData.base64Data?.length || 0
     });
 
-    // Extract structured data using Gemini
-    const extractedData = await extractWithRetry(
-      shouldUseVisionAPI ? '' : parsedData.textContent,  // Empty string for visual files
-      fileType,
-      shouldUseVisionAPI ? parsedData.base64Data : null  // Only pass base64 for visual files
-    );
+    // Extract structured data using Gemini (with automatic retries)
+    // Smart strategy: prefer text extraction if available, fallback to Vision API
+    let extractedData;
+    try {
+      extractedData = await extractWithRetry(
+        parsedData.textContent || '',  // Use text content if available (preferred)
+        fileType,
+        parsedData.base64Data || null  // Provide base64 as fallback
+      );
+    } catch (extractError) {
+      // If extraction fails completely, provide helpful guidance
+      console.error('❌ Extraction failed after all retries:', extractError);
+      onProgress?.({ status: 'error', progress: 60, message: 'AI service temporarily unavailable - trying again in a moment...' });
+      throw extractError;
+    }
     
     onProgress?.({ status: 'validating', progress: 80, message: 'Validating extracted data...' });
     

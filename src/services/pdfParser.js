@@ -23,22 +23,25 @@ export const parsePDFFile = async (file) => {
           fileName: file.name,
           fileSize: file.size,
           base64Length: base64.length,
+          sizeInMB: (file.size / (1024 * 1024)).toFixed(2),
         });
         
+        // Return both base64 and empty text content
+        // The extraction logic will try Vision API first
         resolve({
           base64Data: base64,
           fileName: file.name,
           fileSize: file.size,
-          textContent: '', // Empty string since we'll use Vision API
+          textContent: '', // Empty - will use Vision API
         });
       } catch (error) {
-        console.error('PDF parsing error:', error);
+        console.error('❌ PDF parsing error:', error);
         reject(new Error(`PDF parsing failed: ${error.message}`));
       }
     };
     
     reader.onerror = (error) => {
-      console.error('Failed to read PDF:', error);
+      console.error('❌ Failed to read PDF:', error);
       reject(new Error('Failed to read PDF file'));
     };
     reader.readAsArrayBuffer(file);

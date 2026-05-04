@@ -207,14 +207,22 @@ export const extractInvoiceData = async (fileContent, fileType, fileData = null)
     
     let result;
     
-    console.log('📄 Extracting data from file:', {
-      type: fileType,
-      hasFileData: !!fileData,
-      contentLength: fileContent?.length || 0,
-      contentPreview: fileContent?.substring(0, 100) + '...'
+    // Determine if we should use Vision API
+    const hasTextContent = fileContent && fileContent.trim().length > 50;
+    const hasFileData = fileData && fileData.length > 0;
+    const useVisionAPI = (fileType === 'image' || (fileType === 'pdf' && !hasTextContent)) && hasFileData;
+    
+    console.log('📄 Extraction strategy:', {
+      fileType,
+      hasTextContent,
+      hasFileData,
+      useVisionAPI,
+      textContentLength: fileContent?.length || 0,
+      base64Length: fileData?.length || 0
     });
     
-    if ((fileType === 'image' || fileType === 'pdf') && fileData) {
+    if (useVisionAPI) {
+      // Use Vision API for images or PDFs without text extraction
       const parts = [
         { text: prompt },
         {
@@ -224,22 +232,46 @@ export const extractInvoiceData = async (fileContent, fileType, fileData = null)
           },
         },
       ];
-      console.log('🖼️ Processing with vision API:', {
+      console.log('🖼️ Using Vision API:', {
         fileType,
         promptLength: prompt.length,
         base64Length: fileData?.length || 0
       });
       result = await model.generateContent(parts);
-    } else {
-      console.log('📝 Processing text content:', {
+    } else if (hasTextContent) {
+      // Use text content (preferred for PDFs with extracted text)
+      console.log('📝 Using text extraction:', {
         promptLength: prompt.length,
-        contentType: fileType
+        contentType: fileType,
+        textLength: fileContent.length
       });
       result = await model.generateContent(prompt);
+    } else {
+      // Fallback to Vision API if we have file data
+      if (hasFileData) {
+        console.log('🔄 Falling back to Vision API - no text content');
+        const parts = [
+          { text: prompt },
+          {
+            inlineData: {
+              data: fileData,
+              mimeType: fileType === 'pdf' ? 'application/pdf' : 'image/jpeg',
+            },
+          },
+        ];
+        result = await model.generateContent(parts);
+      } else {
+        throw new Error('No content available for extraction - neither text nor file data');
+      }
     }
     
     const response = await result.response;
     let text = response.text();
+    
+    console.log('🎯 Raw Gemini response:', {
+      length: text.length,
+      preview: text.substring(0, 300)
+    });
     
     try {
       // Clean up markdown formatting if present
@@ -269,7 +301,7 @@ export const extractInvoiceData = async (fileContent, fileType, fileData = null)
       );
 
       if (isEmpty) {
-        console.warn('No data extracted, checking raw content...');
+        console.warn('⚠️ No data extracted from Gemini, checking raw content...');
         
         // Log the first 500 characters of raw content for debugging
         console.log('Raw content preview:', fileContent.substring(0, 500));
@@ -277,21 +309,27 @@ export const extractInvoiceData = async (fileContent, fileType, fileData = null)
         // Try deterministic parsing as fallback
         const extracted = deterministicParse(fileContent);
         if (extracted.hasData) {
-          console.log('Found data using deterministic parser');
+          console.log('✅ Found data using deterministic parser');
           return extracted.data;
         }
         
         throw new Error('No invoice data could be extracted from the content');
       }
       
+      console.log('✅ Data extraction successful - found:', {
+        invoices: data.invoices.length,
+        products: data.products.length,
+        customers: data.customers.length
+      });
+      
       return data;
     } catch (parseError) {
-      console.error('Failed to parse Gemini response as JSON:', parseError);
+      console.error('❌ Failed to parse Gemini response as JSON:', parseError);
       console.log('Raw response:', text);
       throw new Error('Invalid JSON response from Gemini: ' + parseError.message);
     }
   } catch (error) {
-    console.error('Extraction error:', error);
+    console.error('❌ Extraction error:', error);
     throw error;
   }
 };
@@ -299,29 +337,75 @@ export const extractInvoiceData = async (fileContent, fileType, fileData = null)
 
 
 export const extractWithRetry = async (fileContent, fileType, fileData = null) => {
-  const maxRetries = 3;
+  // Increased retries for 503 errors (service unavailable)
+  const maxRetries = 5;
+  const max503Retries = 10;
   let lastError;
+  let is503Error = false;
   
-  for (let i = 0; i < maxRetries; i++) {
+  // Determine max retries based on error type
+  let retriesAllowed = maxRetries;
+  
+  for (let i = 0; i < retriesAllowed; i++) {
     try {
-      console.log(`Extraction attempt ${i + 1}/${maxRetries}`);
+      console.log(`🔄 Extraction attempt ${i + 1}/${retriesAllowed}`);
       const result = await extractInvoiceData(fileContent, fileType, fileData);
 
-      console.log('Extraction successful!',result);
+      console.log('✅ Extraction successful!', result);
       return result;
     } catch (error) {
       lastError = error;
-      console.error(`Attempt ${i + 1} failed:`, error.message);
+      const errorMessage = error.message || error.toString();
       
-      if (i < maxRetries - 1) {
-        const waitTime = 1000 * Math.pow(2, i);
-        console.log(`Waiting ${waitTime}ms before retry...`);
+      // Check if this is a 503 Service Unavailable error
+      is503Error = errorMessage.includes('503') || 
+                   errorMessage.includes('high demand') ||
+                   errorMessage.includes('Service Unavailable');
+      
+      console.error(`❌ Attempt ${i + 1} failed:`, errorMessage);
+      
+      // If we detected a 503 error and haven't reached max 503 retries, increase retry limit
+      if (is503Error && retriesAllowed === maxRetries) {
+        retriesAllowed = max503Retries;
+        console.log(`⚠️ Detected API high demand (503). Increasing retries to ${max503Retries} attempts.`);
+      }
+      
+      if (i < retriesAllowed - 1) {
+        // Enhanced backoff strategy:
+        // - For 503 errors: use longer exponential backoff with jitter
+        // - For other errors: use standard backoff
+        let waitTime;
+        
+        if (is503Error) {
+          // For 503: wait longer (start at 2s, max 64s) with jitter
+          const baseWait = Math.min(2000 * Math.pow(2, i), 64000);
+          const jitter = Math.random() * 1000; // 0-1s random jitter
+          waitTime = baseWait + jitter;
+        } else {
+          // For other errors: shorter backoff (1s, 2s, 4s, 8s, 16s)
+          waitTime = 1000 * Math.pow(2, Math.min(i, 4));
+        }
+        
+        const waitSeconds = (waitTime / 1000).toFixed(1);
+        console.log(`⏳ Waiting ${waitSeconds}s before retry ${i + 2}/${retriesAllowed}...`);
+        console.log(`💡 Tip: If this persists, the Gemini API may be experiencing temporary issues. Try again in a few minutes.`);
+        
         await new Promise(resolve => setTimeout(resolve, waitTime));
       }
     }
   }
   
-  console.error('All extraction attempts failed');
+  // Provide helpful error message based on error type
+  console.error('❌ All extraction attempts failed');
+  
+  if (is503Error) {
+    const errorMsg = 'Google Generative AI service is experiencing high demand. ' +
+                     'This is temporary - please try again in a few minutes. ' +
+                     'If the issue persists, check your internet connection or API quota.';
+    console.error('⚠️ ' + errorMsg);
+    throw new Error(errorMsg);
+  }
+  
   throw lastError;
 };
 

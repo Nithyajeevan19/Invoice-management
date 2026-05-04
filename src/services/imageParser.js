@@ -4,21 +4,34 @@ export const parseImageFile = async (file) => {
     
     reader.onload = (e) => {
       try {
-        const base64Data = e.target.result.split(',')[1];
+        const dataUrl = e.target.result;
+        const base64Data = dataUrl.includes(',') ? dataUrl.split(',')[1] : dataUrl;
+        
+        console.log('🖼️ Image processed:', {
+          fileName: file.name,
+          fileSize: file.size,
+          mimeType: file.type,
+          base64Length: base64Data.length,
+          sizeInMB: (file.size / (1024 * 1024)).toFixed(2),
+        });
         
         resolve({
           base64Data,
           fileName: file.name,
           fileSize: file.size,
           mimeType: file.type,
-          textContent: 'Image file - will be processed by Gemini Vision API',
+          textContent: '', // Images need Vision API
         });
       } catch (error) {
+        console.error('❌ Image parsing failed:', error);
         reject(new Error(`Image parsing failed: ${error.message}`));
       }
     };
     
-    reader.onerror = () => reject(new Error('Failed to read image file'));
+    reader.onerror = () => {
+      console.error('❌ Failed to read image file');
+      reject(new Error('Failed to read image file'));
+    };
     reader.readAsDataURL(file);
   });
 };
