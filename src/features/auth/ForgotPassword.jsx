@@ -1,3 +1,4 @@
+/*
 import { useState } from "react";
 import { resetPasswordForEmail } from "../../services/auth/authService";
 import { Mail, ArrowLeft, Send, Loader2 } from "lucide-react";
@@ -73,4 +74,9 @@ export default function ForgotPassword({ onBackToLogin }) {
       </form>
     </div>
   );
+}
+*/
+
+export default function ForgotPassword() {
+  return null;
 }

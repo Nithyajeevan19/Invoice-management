@@ -1,3 +1,4 @@
+/*
 import { useState } from "react";
 import { signUp } from "../../services/auth/authService";
 import { Mail, Lock, User, ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
@@ -155,4 +156,9 @@ export default function SignUp({ onToggleMode }) {
       </div>
     </div>
   );
+}
+*/
+
+export default function SignUp() {
+  return null;
 }

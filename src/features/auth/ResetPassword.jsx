@@ -1,3 +1,4 @@
+/*
 import { useState } from "react";
 import { updatePassword } from "../../services/auth/authService";
 import { Lock, Save, Loader2, ShieldCheck } from "lucide-react";
@@ -92,4 +93,9 @@ export default function ResetPassword() {
       </div>
     </div>
   );
+}
+*/
+
+export default function ResetPassword() {
+  return null;
 }

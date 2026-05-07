@@ -23,6 +23,7 @@ const App = () => {
 
   useEffect(() => {
     // Check initial session
+    /*
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setLoading(false);
@@ -38,15 +39,20 @@ const App = () => {
     });
 
     return () => subscription.unsubscribe();
+    */
+    setLoading(false);
+    setSession({ user: { email: 'demo@example.com' } });
   }, []);
 
   const handleLogout = async () => {
+    /*
     const { error } = await signOut();
     if (error) {
       toast.error(error.message);
     } else {
       toast.success("Logged out successfully");
     }
+    */
   };
 
   const tabs = [
@@ -67,6 +73,7 @@ const App = () => {
     );
   }
 
+  /*
   if (!session) {
     return (
       <>
@@ -83,6 +90,7 @@ const App = () => {
       </div>
     );
   }
+  */
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -123,6 +131,7 @@ const App = () => {
                   AI-Powered Data Extraction & Management
                 </p>
               </div>
+              {/* 
               <div className="flex items-center gap-6">
                 <div className="hidden md:flex items-center gap-3 px-4 py-2 bg-gray-50 rounded-xl border border-gray-100">
                   <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
@@ -131,7 +140,7 @@ const App = () => {
                   <div className="flex flex-col">
                     <span className="text-xs text-gray-400 font-bold uppercase tracking-wider">Active Session</span>
                     <span className="text-sm font-semibold text-gray-700 truncate max-w-[150px]">
-                      {session.user.email}
+                      {session?.user?.email}
                     </span>
                   </div>
                 </div>
@@ -143,6 +152,7 @@ const App = () => {
                   <span>Logout</span>
                 </button>
               </div>
+              */}
             </div>
           </div>
         </header>

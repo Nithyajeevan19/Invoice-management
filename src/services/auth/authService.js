@@ -1,3 +1,4 @@
+/*
 import { supabase } from "../../lib/supabase";
 
 export const signUp = async (email, password) => {
@@ -34,3 +35,12 @@ export const updatePassword = async (newPassword) => {
     password: newPassword,
   });
 };
+*/
+
+// Mock exports to prevent breakages
+export const signUp = async () => ({ data: {}, error: null });
+export const signIn = async () => ({ data: {}, error: null });
+export const signOut = async () => ({ error: null });
+export const getCurrentUser = async () => ({ data: { user: {} }, error: null });
+export const resetPasswordForEmail = async () => ({ data: {}, error: null });
+export const updatePassword = async () => ({ data: {}, error: null });

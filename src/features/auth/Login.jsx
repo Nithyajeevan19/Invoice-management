@@ -1,3 +1,4 @@
+/*
 import { useState } from "react";
 import { signIn } from "../../services/auth/authService";
 import { Mail, Lock, LogIn, ArrowRight, Loader2, ShieldCheck } from "lucide-react";
@@ -122,4 +123,9 @@ export default function Login({ onToggleMode, onForgotPassword }) {
       </div>
     </div>
   );
+}
+*/
+
+export default function Login() {
+  return null;
 }
