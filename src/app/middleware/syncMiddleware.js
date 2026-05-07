@@ -1,5 +1,5 @@
-import { updateInvoiceProducts, updateInvoiceCustomer } from '../slices/invoiceSlice';
-import { updateCustomerPurchaseAmount } from '../slices/customerSlice';
+import { updateInvoiceProducts, updateInvoiceCustomer } from '../../features/invoices/invoiceSlice';
+import { updateCustomerPurchaseAmount } from '../../features/customers/customerSlice';
 
 /**
  * Middleware to sync changes across Redux slices

@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { Trash2, CreditCard, DollarSign } from 'lucide-react';
-import { deletePayment } from '../redux/slices/paymentSlice';
+import { deletePayment } from '../paymentSlice';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 

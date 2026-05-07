@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { X, CreditCard, DollarSign } from 'lucide-react';
-import { addPayment } from '../redux/slices/paymentSlice';
-import { updateInvoiceStatus } from '../redux/slices/invoiceSlice';
+import { addPayment } from '../../payments/paymentSlice';
+import { updateInvoiceStatus } from '../invoiceSlice';
 import toast from 'react-hot-toast';
 
 const PaymentModal = ({ invoice, onClose }) => {

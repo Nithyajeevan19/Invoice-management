@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { v4 as uuidv4 } from 'uuid';
 
 const initialState = {
   invoices: [],
@@ -11,24 +10,9 @@ const initialState = {
 // Async thunk for adding multiple invoices
 export const addInvoicesAsync = createAsyncThunk(
   'invoices/addMultiple',
-  async (invoicesData, { rejectWithValue }) => {
+  async (processedInvoices, { rejectWithValue }) => {
     try {
-      // Add IDs and timestamps to invoices
-      const processedInvoices = invoicesData.map(invoice => ({
-        ...invoice,
-        id: invoice.id || uuidv4(),
-        createdAt: new Date().toISOString(),
-        validationErrors: invoice.validationErrors || [],
-        status: invoice.status || 'draft',
-        taxBreakdown: invoice.taxBreakdown || {
-          cgst: 0,
-          sgst: 0,
-          igst: 0,
-          totalTax: 0,
-        },
-        sellerState: invoice.sellerState || 'KARNATAKA',
-        buyerState: invoice.buyerState || '',
-      }));
+      // Logic for processing should happen in the service/workflow layer
       return processedInvoices;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -41,12 +25,7 @@ const invoiceSlice = createSlice({
   initialState,
   reducers: {
     addInvoice: (state, action) => {
-      state.invoices.push({
-        ...action.payload,
-        id: action.payload.id || uuidv4(),
-        createdAt: new Date().toISOString(),
-        status: action.payload.status || 'draft', // ADD STATUS
-      });
+      state.invoices.push(action.payload);
       state.lastUpdated = new Date().toISOString();
     },
 
@@ -72,12 +51,11 @@ const invoiceSlice = createSlice({
     },
 
     updateInvoiceProducts: (state, action) => {
-      const { invoiceId, products } = action.payload;
+      const { invoiceId, products, totalAmount } = action.payload;
       const invoice = state.invoices.find(inv => inv.id === invoiceId);
       if (invoice) {
         invoice.products = products;
-        // Recalculate total
-        invoice.totalAmount = products.reduce((sum, p) => sum + (p.amount || 0), 0);
+        invoice.totalAmount = totalAmount;
         state.lastUpdated = new Date().toISOString();
       }
     },
@@ -105,6 +83,14 @@ const invoiceSlice = createSlice({
         invoice.validationErrors = errors;
       }
     },
+    
+    setLoading: (state, action) => {
+      state.loading = action.payload;
+    },
+    
+    setError: (state, action) => {
+      state.error = action.payload;
+    }
   },
 
   extraReducers: (builder) => {
@@ -134,6 +120,9 @@ export const {
   clearInvoices,
   updateInvoiceStatus,
   setValidationErrors,
+  setLoading,
+  setError
 } = invoiceSlice.actions;
 
 export default invoiceSlice.reducer;
+

@@ -1,21 +1,20 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { useState } from 'react';
 import { Trash2, Edit2, Save, X, AlertCircle } from 'lucide-react';
-import { updateProduct, deleteProduct } from '../redux/slices/productSlice';
+import { updateCustomer, deleteCustomer } from '../customerSlice';
 import toast from 'react-hot-toast';
-import { exportToExcel } from '../utils/exportToExcel';
+import { exportToExcel } from '../../../services/export/excelService';
 import { Download } from 'lucide-react';
 
-
-const ProductsTab = () => {
+const CustomersTab = () => {
   const dispatch = useDispatch();
-  const products = useSelector((state) => state.products.products);
+  const customers = useSelector((state) => state.customers.customers);
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
 
-  const startEdit = (product) => {
-    setEditingId(product.id);
-    setEditForm(product);
+  const startEdit = (customer) => {
+    setEditingId(customer.id);
+    setEditForm(customer);
   };
 
   const cancelEdit = () => {
@@ -24,16 +23,16 @@ const ProductsTab = () => {
   };
 
   const saveEdit = () => {
-    dispatch(updateProduct(editForm));
-    toast.success('Product updated! Changes synced to invoices.', { duration: 3000 });
+    dispatch(updateCustomer(editForm));
+    toast.success('Customer updated! Changes synced to invoices.', { duration: 3000 });
     setEditingId(null);
     setEditForm({});
   };
 
   const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
-      dispatch(deleteProduct(id));
-      toast.success('Product deleted');
+    if (window.confirm('Are you sure you want to delete this customer?')) {
+      dispatch(deleteCustomer(id));
+      toast.success('Customer deleted');
     }
   };
 
@@ -44,28 +43,27 @@ const ProductsTab = () => {
     }));
   };
 
-  const hasValidationErrors = (product) => {
-    return product.validationErrors && product.validationErrors.length > 0;
+  const hasValidationErrors = (customer) => {
+    return customer.validationErrors && customer.validationErrors.length > 0;
   };
 
-  const isFieldMissing = (product, field) => {
-    return product.validationErrors?.includes(field);
+  const isFieldMissing = (customer, field) => {
+    return customer.validationErrors?.includes(field);
   };
 
-  if (products.length === 0) {
+  if (customers.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500 text-lg">No products found</p>
-        <p className="text-gray-400 text-sm mt-2">Upload invoice files to see product data</p>
+        <p className="text-gray-500 text-lg">No customers found</p>
+        <p className="text-gray-400 text-sm mt-2">Upload invoice files to see customer data</p>
       </div>
     );
   }
 
   return (
     <div className="overflow-x-auto">
-      
       <button
-        onClick={() => exportToExcel(products, "products_export.xlsx", "Products")}
+        onClick={() => exportToExcel(customers, "customers_export.xlsx", "Customers")}
         className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 ml-2"
       >
         <Download className="h-5 w-5 mr-1" />
@@ -76,22 +74,22 @@ const ProductsTab = () => {
         <thead className="bg-gray-100">
           <tr>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-              Name
+              Customer Name
             </th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-              Quantity
+              Phone Number
             </th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-              Unit Price
+              Email
             </th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-              Tax
+              GSTIN
             </th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-              Price with Tax
+              Address
             </th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-              Discount
+              Total Purchase Amount
             </th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
               Actions
@@ -99,17 +97,17 @@ const ProductsTab = () => {
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
-          {products.map((product) => {
-            const isEditing = editingId === product.id;
-            const currentData = isEditing ? editForm : product;
+          {customers.map((customer) => {
+            const isEditing = editingId === customer.id;
+            const currentData = isEditing ? editForm : customer;
 
             return (
               <tr
-                key={product.id}
-                className={`hover:bg-gray-50 ${hasValidationErrors(product) ? 'bg-red-50' : ''}`}
+                key={customer.id}
+                className={`hover:bg-gray-50 ${hasValidationErrors(customer) ? 'bg-red-50' : ''}`}
               >
-                {/* Name */}
-                <td className={`px-4 py-3 ${isFieldMissing(product, 'name') ? 'validation-error' : ''}`}>
+                {/* Customer Name */}
+                <td className={`px-4 py-3 ${isFieldMissing(customer, 'name') ? 'validation-error' : ''}`}>
                   {isEditing ? (
                     <input
                       type="text"
@@ -119,89 +117,74 @@ const ProductsTab = () => {
                     />
                   ) : (
                     <span className="font-medium text-gray-900">
-                      {product.name || <span className="validation-missing">Missing ⚠️</span>}
+                      {customer.name || <span className="validation-missing">Missing ⚠️</span>}
                     </span>
                   )}
                 </td>
 
-                {/* Quantity */}
-                <td className={`px-4 py-3 ${isFieldMissing(product, 'quantity') ? 'validation-error' : ''}`}>
+                {/* Phone Number */}
+                <td className={`px-4 py-3 ${isFieldMissing(customer, 'phoneNumber') ? 'validation-error' : ''}`}>
                   {isEditing ? (
                     <input
-                      type="number"
-                      value={currentData.quantity}
-                      onChange={(e) => handleEditChange('quantity', parseFloat(e.target.value))}
-                      className="border rounded px-2 py-1 w-24"
+                      type="tel"
+                      value={currentData.phoneNumber}
+                      onChange={(e) => handleEditChange('phoneNumber', e.target.value)}
+                      className="border rounded px-2 py-1 w-full"
                     />
                   ) : (
                     <span className="text-gray-900">
-                      {product.quantity || <span className="validation-missing">Missing ⚠️</span>}
+                      {customer.phoneNumber || <span className="validation-missing">Missing ⚠️</span>}
                     </span>
                   )}
                 </td>
 
-                {/* Unit Price */}
-                <td className={`px-4 py-3 ${isFieldMissing(product, 'unitPrice') ? 'validation-error' : ''}`}>
-                  {isEditing ? (
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={currentData.unitPrice}
-                      onChange={(e) => handleEditChange('unitPrice', parseFloat(e.target.value))}
-                      className="border rounded px-2 py-1 w-24"
-                    />
-                  ) : (
-                    <span className="text-gray-900">
-                      {product.unitPrice ? `₹${product.unitPrice.toFixed(2)}` : <span className="validation-missing">Missing ⚠️</span>}
-                    </span>
-                  )}
-                </td>
-
-                {/* Tax */}
+                {/* Email */}
                 <td className="px-4 py-3">
                   {isEditing ? (
                     <input
-                      type="number"
-                      step="0.01"
-                      value={currentData.tax}
-                      onChange={(e) => handleEditChange('tax', parseFloat(e.target.value))}
-                      className="border rounded px-2 py-1 w-24"
+                      type="email"
+                      value={currentData.email || ''}
+                      onChange={(e) => handleEditChange('email', e.target.value)}
+                      className="border rounded px-2 py-1 w-full"
                     />
                   ) : (
-                    <span className="text-gray-900">₹{product.tax?.toFixed(2) || '0.00'}</span>
+                    <span className="text-gray-600">{customer.email || '-'}</span>
                   )}
                 </td>
 
-                {/* Price with Tax */}
+                {/* GSTIN */}
                 <td className="px-4 py-3">
                   {isEditing ? (
                     <input
-                      type="number"
-                      step="0.01"
-                      value={currentData.priceWithTax}
-                      onChange={(e) => handleEditChange('priceWithTax', parseFloat(e.target.value))}
-                      className="border rounded px-2 py-1 w-24"
+                      type="text"
+                      value={currentData.gstin || ''}
+                      onChange={(e) => handleEditChange('gstin', e.target.value)}
+                      className="border rounded px-2 py-1 w-full"
                     />
                   ) : (
-                    <span className="font-semibold text-gray-900">
-                      ₹{product.priceWithTax?.toFixed(2) || '0.00'}
-                    </span>
+                    <span className="text-gray-600 text-sm">{customer.gstin || '-'}</span>
                   )}
                 </td>
 
-                {/* Discount */}
-                <td className="px-4 py-3">
+                {/* Address */}
+                <td className="px-4 py-3 max-w-xs">
                   {isEditing ? (
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={currentData.discount || 0}
-                      onChange={(e) => handleEditChange('discount', parseFloat(e.target.value))}
-                      className="border rounded px-2 py-1 w-24"
+                    <textarea
+                      value={currentData.address || ''}
+                      onChange={(e) => handleEditChange('address', e.target.value)}
+                      className="border rounded px-2 py-1 w-full"
+                      rows="2"
                     />
                   ) : (
-                    <span className="text-gray-600">₹{product.discount?.toFixed(2) || '0.00'}</span>
+                    <span className="text-gray-600 text-sm">{customer.address || '-'}</span>
                   )}
+                </td>
+
+                {/* Total Purchase Amount */}
+                <td className={`px-4 py-3 ${isFieldMissing(customer, 'totalPurchaseAmount') ? 'validation-error' : ''}`}>
+                  <span className="font-semibold text-gray-900">
+                    {customer.totalPurchaseAmount ? `₹${customer.totalPurchaseAmount.toFixed(2)}` : <span className="validation-missing">Missing ⚠️</span>}
+                  </span>
                 </td>
 
                 {/* Actions */}
@@ -227,14 +210,14 @@ const ProductsTab = () => {
                     ) : (
                       <>
                         <button
-                          onClick={() => startEdit(product)}
+                          onClick={() => startEdit(customer)}
                           className="text-blue-600 hover:text-blue-800"
                           title="Edit"
                         >
                           <Edit2 className="h-4 w-4" />
                         </button>
                         <button
-                          onClick={() => handleDelete(product.id)}
+                          onClick={() => handleDelete(customer.id)}
                           className="text-red-600 hover:text-red-800"
                           title="Delete"
                         >
@@ -251,13 +234,13 @@ const ProductsTab = () => {
       </table>
 
       {/* Missing Fields Warning */}
-      {products.some(p => hasValidationErrors(p)) && (
+      {customers.some(c => hasValidationErrors(c)) && (
         <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-start">
           <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5 mr-3 flex-shrink-0" />
           <div>
             <p className="text-sm font-medium text-yellow-800">Missing Required Fields</p>
             <p className="text-xs text-yellow-700 mt-1">
-              Some products have missing or incomplete data (highlighted in red). Please review and complete them.
+              Some customers have missing or incomplete data (highlighted in red). Please review and complete them.
             </p>
           </div>
         </div>
@@ -266,4 +249,4 @@ const ProductsTab = () => {
   );
 };
 
-export default ProductsTab;
+export default CustomersTab;

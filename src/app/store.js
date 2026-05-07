@@ -1,11 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
-import invoiceReducer from './slices/invoiceSlice';
-import productReducer from './slices/productSlice';
-import customerReducer from './slices/customerSlice';
-import fileReducer from './slices/fileSlice';
+import invoiceReducer from '../features/invoices/invoiceSlice';
+import productReducer from '../features/products/productSlice';
+import customerReducer from '../features/customers/customerSlice';
+import fileReducer from '../features/invoices/fileSlice';
+import filterReducer from '../features/invoices/filterSlice'; 
+import paymentReducer from '../features/payments/paymentSlice';
 import syncMiddleware from './middleware/syncMiddleware';
-import filterReducer from './slices/filterSlice'; 
-import paymentReducer from './slices/paymentSlice';
+
 export const store = configureStore({
   reducer: {
     invoices: invoiceReducer,
@@ -24,3 +25,4 @@ export const store = configureStore({
       },
     }).concat(syncMiddleware),
 });
+

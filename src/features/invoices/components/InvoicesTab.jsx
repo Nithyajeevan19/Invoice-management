@@ -1,25 +1,28 @@
 import { useSelector, useDispatch } from 'react-redux';
-import React, { useState } from 'react';
-import { Trash2, Edit2, Save, X, AlertCircle, Search, Filter, RotateCcw, Download, DollarSign, Receipt, FileText } from 'lucide-react';
-import { updateInvoice, deleteInvoice, updateInvoiceStatus } from '../redux/slices/invoiceSlice';
-import { setInvoiceSearchTerm, setInvoiceAmountRange, setInvoiceDateRange, setInvoiceStatusFilter, resetInvoiceFilters } from '../redux/slices/filterSlice';
+import React, { useState, useMemo } from 'react';
+import { Trash2, Edit2, Save, X, AlertCircle, Search, Filter, RotateCcw, Download, DollarSign, Receipt, FileText, Mail } from 'lucide-react';
+import { updateInvoice, deleteInvoice, updateInvoiceStatus } from '../invoiceSlice';
+import { setInvoiceSearchTerm, setInvoiceAmountRange, setInvoiceDateRange, setInvoiceStatusFilter, resetInvoiceFilters } from '../filterSlice';
+import { selectAllInvoices, selectInvoiceAnalytics } from '../invoiceSelectors';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
-import { exportToExcel } from '../utils/exportToExcel';
-import StatusBadge from './StatusBadge';
+import { exportToExcel } from '../../../services/export/excelService';
+import StatusBadge from '../../../shared/components/StatusBadge';
 import PaymentModal from './PaymentModal';
-import TaxBreakdown from './TaxBreakdown';
+import TaxBreakdown from '../../../shared/components/TaxBreakdown';
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { PdfInvoice } from "./PdfInvoice";
-import { Mail } from 'lucide-react';
 import EmailModal from './EmailModal';
-import UPIQRCode from './UPIQRCode';
+import UPIQRCode from '../../../shared/components/UPIQRCode';
+
 
 
 const InvoicesTab = () => {
   const dispatch = useDispatch();
-  const invoices = useSelector((state) => state.invoices.invoices);
+  const invoices = useSelector(selectAllInvoices);
+  const analytics = useSelector(selectInvoiceAnalytics);
   const filters = useSelector((state) => state.filters.invoiceFilters);
+  
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [showFilters, setShowFilters] = useState(false);
@@ -27,26 +30,28 @@ const InvoicesTab = () => {
   const [expandedInvoice, setExpandedInvoice] = useState(null);
   const [emailModalInvoice, setEmailModalInvoice] = useState(null);
 
+  // Apply filters with useMemo for performance
+  const filteredInvoices = useMemo(() => {
+    return invoices.filter((invoice) => {
+      const matchesSearch =
+        invoice.serialNumber?.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+        invoice.customerName?.toLowerCase().includes(filters.searchTerm.toLowerCase());
 
-  // Apply filters
-  const filteredInvoices = invoices.filter((invoice) => {
-    const matchesSearch =
-      invoice.serialNumber?.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
-      invoice.customerName?.toLowerCase().includes(filters.searchTerm.toLowerCase());
+      const matchesAmount =
+        (!filters.minAmount || invoice.totalAmount >= parseFloat(filters.minAmount)) &&
+        (!filters.maxAmount || invoice.totalAmount <= parseFloat(filters.maxAmount));
 
-    const matchesAmount =
-      (!filters.minAmount || invoice.totalAmount >= parseFloat(filters.minAmount)) &&
-      (!filters.maxAmount || invoice.totalAmount <= parseFloat(filters.maxAmount));
+      const invoiceDate = new Date(invoice.date);
+      const matchesDate =
+        (!filters.startDate || invoiceDate >= new Date(filters.startDate)) &&
+        (!filters.endDate || invoiceDate <= new Date(filters.endDate));
 
-    const invoiceDate = new Date(invoice.date);
-    const matchesDate =
-      (!filters.startDate || invoiceDate >= new Date(filters.startDate)) &&
-      (!filters.endDate || invoiceDate <= new Date(filters.endDate));
+      const matchesStatus = !filters.status || invoice.status === filters.status;
 
-    const matchesStatus = !filters.status || invoice.status === filters.status;
+      return matchesSearch && matchesAmount && matchesDate && matchesStatus;
+    });
+  }, [invoices, filters]);
 
-    return matchesSearch && matchesAmount && matchesDate && matchesStatus;
-  });
 
   const startEdit = (invoice) => {
     setEditingId(invoice.id);
@@ -96,30 +101,7 @@ const InvoicesTab = () => {
     );
   }
 
-  const totalValue = invoices.reduce((sum, inv) => sum + (inv.totalAmount || 0), 0);
-  const totalTax = invoices.reduce((sum, inv) => sum + (inv.taxAmount || 0), 0);
-
-  const customerTotals = invoices.reduce((map, inv) => {
-    const name = inv.customerName || 'Unknown';
-    map[name] = (map[name] || 0) + (inv.totalAmount || 0);
-    return map;
-  }, {});
-  const topCustomer = Object.keys(customerTotals).reduce((best, k) => {
-    if (!best) return k;
-    return customerTotals[k] > customerTotals[best] ? k : best;
-  }, null) || '';
-
-  const productTotals = invoices.reduce((map, inv) => {
-    (inv.products || []).forEach((p) => {
-      const name = p.name || p.productName || 'Unknown Product';
-      map[name] = (map[name] || 0) + (p.quantity || 0);
-    });
-    return map;
-  }, {});
-  const topProduct = Object.keys(productTotals).reduce((best, k) => {
-    if (!best) return k;
-    return productTotals[k] > productTotals[best] ? k : best;
-  }, null) || '';
+  const { totalAmount, countByStatus } = analytics;
 
   return (
     <div className="overflow-x-auto">
@@ -131,21 +113,22 @@ const InvoicesTab = () => {
         </div>
         <div className="mb-2 sm:mb-0">
           <p className="text-sm text-gray-500">Total Value</p>
-          <p className="text-lg font-medium text-gray-900">₹{totalValue.toFixed(2)}</p>
+          <p className="text-lg font-medium text-gray-900">₹{totalAmount.toFixed(2)}</p>
         </div>
         <div className="mb-2 sm:mb-0">
-          <p className="text-sm text-gray-500">Total Tax</p>
-          <p className="text-lg font-medium text-gray-900">₹{totalTax.toFixed(2)}</p>
+          <p className="text-sm text-gray-500">Paid Amount</p>
+          <p className="text-lg font-medium text-green-600">₹{analytics.paidAmount.toFixed(2)}</p>
         </div>
         <div className="mb-2 sm:mb-0">
-          <p className="text-sm text-gray-500">Top Customer</p>
-          <p className="text-sm text-gray-800">{topCustomer || '-'}</p>
+          <p className="text-sm text-gray-500">Pending</p>
+          <p className="text-lg font-medium text-orange-600">₹{analytics.pendingAmount.toFixed(2)}</p>
         </div>
         <div>
-          <p className="text-sm text-gray-500">Top Product</p>
-          <p className="text-sm text-gray-800">{topProduct || '-'}</p>
+          <p className="text-sm text-gray-500">Drafts</p>
+          <p className="text-sm text-gray-800">{countByStatus.draft}</p>
         </div>
       </div>
+
 
       {/* Search & Filter Bar */}
       <div className="mb-4 bg-white rounded-lg shadow-sm p-4">

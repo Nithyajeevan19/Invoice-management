@@ -1,7 +1,8 @@
 import { parseExcelFile } from './excelParser';
 import { parsePDFFile } from './pdfParser';
 import { parseImageFile, validateImageFile } from './imageParser';
-import { extractWithRetry } from './geminiService';
+import { extractWithRetry } from '../ai/geminiService';
+
 
 /**
  * Main file processor - handles all file types

@@ -1,12 +1,13 @@
 import { useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Upload, File, X, AlertCircle, CheckCircle } from 'lucide-react';
-import { processFile, processMultipleFiles, formatFileSize } from '../services/fileProcessor';
-import { addInvoicesAsync } from '../redux/slices/invoiceSlice';
-import { addProducts } from '../redux/slices/productSlice';
-import { addCustomers } from '../redux/slices/customerSlice';
-import { setProcessing, setProgress, addUploadedFile } from '../redux/slices/fileSlice';
+import { processFile, processMultipleFiles, formatFileSize } from '../../../services/parser/fileProcessor';
+import { addInvoicesAsync } from '../invoiceSlice';
+import { addProducts } from '../../products/productSlice';
+import { addCustomers } from '../../customers/customerSlice';
+import { setProcessing, setProgress, addUploadedFile } from '../fileSlice';
 import toast from 'react-hot-toast';
+
 
 const FileUpload = () => {
   const dispatch = useDispatch();
