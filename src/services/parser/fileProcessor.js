@@ -34,18 +34,6 @@ export const processFile = async (file, onProgress) => {
     
     onProgress?.({ status: 'extracting', progress: 50, message: 'Extracting data with AI (retrying if needed)...' });
     
-    console.log('🔄 Processing:', {
-      fileType,
-      fileName: file.name,
-      size: file.size,
-      hasText: !!parsedData.textContent,
-      textLength: parsedData.textContent?.length || 0,
-      hasBase64: !!parsedData.base64Data,
-      base64Length: parsedData.base64Data?.length || 0
-    });
-
-    // Extract structured data using Gemini (with automatic retries)
-    // Smart strategy: prefer text extraction if available, fallback to Vision API
     let extractedData;
     try {
       extractedData = await extractWithRetry(
@@ -54,7 +42,6 @@ export const processFile = async (file, onProgress) => {
         parsedData.base64Data || null  // Provide base64 as fallback
       );
     } catch (extractError) {
-      // If extraction fails completely, provide helpful guidance
       console.error('❌ Extraction failed after all retries:', extractError);
       onProgress?.({ status: 'error', progress: 60, message: 'AI service temporarily unavailable - trying again in a moment...' });
       throw extractError;
@@ -62,11 +49,8 @@ export const processFile = async (file, onProgress) => {
     
     onProgress?.({ status: 'validating', progress: 80, message: 'Validating extracted data...' });
     
-    // Validate extracted data
-    const validatedData = validateExtractedData(extractedData);
-
-  // ---- Compact / normalize the validated data to the exact shape we store/display
-  const compacted = compactExtractedData(validatedData);
+    // Data is already validated in geminiService, now we just compact it
+    const compacted = compactExtractedData(extractedData);
     
     onProgress?.({ status: 'complete', progress: 100, message: 'Processing complete!' });
     
@@ -98,39 +82,38 @@ const compactExtractedData = (data) => {
   };
 
   const invoices = (data.invoices || []).map((inv) => ({
-    // keep keys the UI expects
-    serialNumber: inv.serialNumber || inv.invoiceNumber || '',
-    customerName: inv.customerName || inv.customer || '',
-    date: inv.date || inv.invoiceDate || null,
-    totalAmount: parseNumberSafe(inv.totalAmount || inv.total || inv.amount),
-    taxAmount: parseNumberSafe(inv.taxAmount || inv.tax || 0),
-    // products: ensure productName key exists for UI
+    serialNumber: inv.serialNumber || '',
+    customerName: inv.customerName || '',
+    date: inv.date || null,
+    totalAmount: parseNumberSafe(inv.totalAmount),
+    taxAmount: parseNumberSafe(inv.taxAmount),
     products: (inv.products || []).map((p) => ({
-      productName: p.productName || p.name || p.description || '',
-      quantity: parseNumberSafe(p.quantity || p.qty || 0),
-      unitPrice: parseNumberSafe(p.unitPrice || p.rate || p.price || 0),
-      tax: parseNumberSafe(p.tax || p.taxAmount || 0),
-      amount: parseNumberSafe(p.amount || p.total || 0),
+      productName: p.productName || p.name || '',
+      quantity: parseNumberSafe(p.quantity),
+      unitPrice: parseNumberSafe(p.unitPrice),
+      tax: parseNumberSafe(p.tax),
+      amount: parseNumberSafe(p.amount),
     })),
-    validationErrors: inv.validationErrors || [],
+    validation: data.validation || { errors: [], warnings: [], missingFields: [] },
+    confidence: data.confidence || { score: 0, status: 'low' }
   }));
 
   const products = (data.products || []).map((p) => ({
-    name: p.name || p.productName || '',
-    quantity: parseNumberSafe(p.quantity || p.qty || 0),
-    unitPrice: parseNumberSafe(p.unitPrice || p.rate || p.price || 0),
-    tax: parseNumberSafe(p.tax || p.taxAmount || 0),
-    priceWithTax: parseNumberSafe(p.priceWithTax || p.priceWith_Tax || 0),
+    name: p.name || '',
+    quantity: parseNumberSafe(p.quantity),
+    unitPrice: parseNumberSafe(p.unitPrice),
+    tax: parseNumberSafe(p.tax),
+    priceWithTax: parseNumberSafe(p.priceWithTax),
     discount: parseNumberSafe(p.discount || 0),
   }));
 
   const customers = (data.customers || []).map((c) => ({
     name: c.name || '',
-    phoneNumber: c.phoneNumber || c.phone || '',
+    phoneNumber: c.phoneNumber || '',
     email: c.email || '',
     gstin: c.gstin || '',
     address: c.address || '',
-    totalPurchaseAmount: parseNumberSafe(c.totalPurchaseAmount || c.totalPurchase || 0),
+    totalPurchaseAmount: parseNumberSafe(c.totalPurchaseAmount || 0),
   }));
 
   return {
@@ -138,7 +121,9 @@ const compactExtractedData = (data) => {
     invoices,
     products,
     customers,
-    missingFields: data.missingFields || { invoices: [], products: [], customers: [] },
+    missingFields: data.validation?.missingFields || [],
+    confidence: data.confidence,
+    validation: data.validation
   };
 };
 

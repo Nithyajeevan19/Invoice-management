@@ -61,37 +61,37 @@ const CustomersTab = () => {
   }
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-hidden">
       <button
         onClick={() => exportToExcel(customers, "customers_export.xlsx", "Customers")}
-        className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 ml-2"
+        className="flex items-center justify-center md:justify-start px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 mb-3 md:mb-4 w-full md:w-auto text-sm md:text-base"
       >
-        <Download className="h-5 w-5 mr-1" />
+        <Download className="h-4 md:h-5 w-4 md:w-5 mr-1 md:mr-2" />
         Export to Excel
       </button>
 
-      <table className="min-w-full bg-white border border-gray-200 rounded-lg">
+      <table className="w-full bg-white border border-gray-200 rounded-lg overflow-hidden text-sm md:text-base">
         <thead className="bg-gray-100">
           <tr>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+            <th className="px-3 md:px-4 py-2 md:py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
               Customer Name
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+            <th className="px-3 md:px-4 py-2 md:py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
               Phone Number
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+            <th className="px-3 md:px-4 py-2 md:py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
               Email
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+            <th className="px-3 md:px-4 py-2 md:py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
               GSTIN
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+            <th className="px-3 md:px-4 py-2 md:py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
               Address
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+            <th className="px-3 md:px-4 py-2 md:py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
               Total Purchase Amount
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+            <th className="px-3 md:px-4 py-2 md:py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
               Actions
             </th>
           </tr>
@@ -107,101 +107,101 @@ const CustomersTab = () => {
                 className={`hover:bg-gray-50 ${hasValidationErrors(customer) ? 'bg-red-50' : ''}`}
               >
                 {/* Customer Name */}
-                <td className={`px-4 py-3 ${isFieldMissing(customer, 'name') ? 'validation-error' : ''}`}>
+                <td className={`px-3 md:px-4 py-2 md:py-3 ${isFieldMissing(customer, 'name') ? 'validation-error' : ''}`}>
                   {isEditing ? (
                     <input
                       type="text"
                       value={currentData.name}
                       onChange={(e) => handleEditChange('name', e.target.value)}
-                      className="border rounded px-2 py-1 w-full"
+                      className="border rounded px-2 py-1 w-full text-sm"
                     />
                   ) : (
-                    <span className="font-medium text-gray-900">
+                    <span className="font-medium text-gray-900 text-sm">
                       {customer.name || <span className="validation-missing">Missing ⚠️</span>}
                     </span>
                   )}
                 </td>
 
                 {/* Phone Number */}
-                <td className={`px-4 py-3 ${isFieldMissing(customer, 'phoneNumber') ? 'validation-error' : ''}`}>
+                <td className={`px-3 md:px-4 py-2 md:py-3 ${isFieldMissing(customer, 'phoneNumber') ? 'validation-error' : ''}`}>
                   {isEditing ? (
                     <input
                       type="tel"
                       value={currentData.phoneNumber}
                       onChange={(e) => handleEditChange('phoneNumber', e.target.value)}
-                      className="border rounded px-2 py-1 w-full"
+                      className="border rounded px-2 py-1 w-full text-sm"
                     />
                   ) : (
-                    <span className="text-gray-900">
+                    <span className="text-gray-900 text-sm">
                       {customer.phoneNumber || <span className="validation-missing">Missing ⚠️</span>}
                     </span>
                   )}
                 </td>
 
                 {/* Email */}
-                <td className="px-4 py-3">
+                <td className="px-3 md:px-4 py-2 md:py-3">
                   {isEditing ? (
                     <input
                       type="email"
                       value={currentData.email || ''}
                       onChange={(e) => handleEditChange('email', e.target.value)}
-                      className="border rounded px-2 py-1 w-full"
+                      className="border rounded px-2 py-1 w-full text-sm"
                     />
                   ) : (
-                    <span className="text-gray-600">{customer.email || '-'}</span>
+                    <span className="text-gray-600 text-xs md:text-sm">{customer.email || '-'}</span>
                   )}
                 </td>
 
                 {/* GSTIN */}
-                <td className="px-4 py-3">
+                <td className="px-3 md:px-4 py-2 md:py-3">
                   {isEditing ? (
                     <input
                       type="text"
                       value={currentData.gstin || ''}
                       onChange={(e) => handleEditChange('gstin', e.target.value)}
-                      className="border rounded px-2 py-1 w-full"
+                      className="border rounded px-2 py-1 w-full text-sm"
                     />
                   ) : (
-                    <span className="text-gray-600 text-sm">{customer.gstin || '-'}</span>
+                    <span className="text-gray-600 text-xs md:text-sm">{customer.gstin || '-'}</span>
                   )}
                 </td>
 
                 {/* Address */}
-                <td className="px-4 py-3 max-w-xs">
+                <td className="px-3 md:px-4 py-2 md:py-3 max-w-xs">
                   {isEditing ? (
                     <textarea
                       value={currentData.address || ''}
                       onChange={(e) => handleEditChange('address', e.target.value)}
-                      className="border rounded px-2 py-1 w-full"
+                      className="border rounded px-2 py-1 w-full text-sm"
                       rows="2"
                     />
                   ) : (
-                    <span className="text-gray-600 text-sm">{customer.address || '-'}</span>
+                    <span className="text-gray-600 text-xs md:text-sm">{customer.address || '-'}</span>
                   )}
                 </td>
 
                 {/* Total Purchase Amount */}
-                <td className={`px-4 py-3 ${isFieldMissing(customer, 'totalPurchaseAmount') ? 'validation-error' : ''}`}>
-                  <span className="font-semibold text-gray-900">
+                <td className={`px-3 md:px-4 py-2 md:py-3 ${isFieldMissing(customer, 'totalPurchaseAmount') ? 'validation-error' : ''}`}>
+                  <span className="font-semibold text-gray-900 text-sm">
                     {customer.totalPurchaseAmount ? `₹${customer.totalPurchaseAmount.toFixed(2)}` : <span className="validation-missing">Missing ⚠️</span>}
                   </span>
                 </td>
 
                 {/* Actions */}
-                <td className="px-4 py-3">
-                  <div className="flex space-x-2">
+                <td className="px-2 md:px-4 py-2 md:py-3">
+                  <div className="flex space-x-1 md:space-x-2">
                     {isEditing ? (
                       <>
                         <button
                           onClick={saveEdit}
-                          className="text-green-600 hover:text-green-800"
+                          className="text-green-600 hover:text-green-800 p-1 rounded hover:bg-green-50"
                           title="Save"
                         >
                           <Save className="h-4 w-4" />
                         </button>
                         <button
                           onClick={cancelEdit}
-                          className="text-gray-600 hover:text-gray-800"
+                          className="text-gray-600 hover:text-gray-800 p-1 rounded hover:bg-gray-50"
                           title="Cancel"
                         >
                           <X className="h-4 w-4" />
@@ -211,14 +211,14 @@ const CustomersTab = () => {
                       <>
                         <button
                           onClick={() => startEdit(customer)}
-                          className="text-blue-600 hover:text-blue-800"
+                          className="text-blue-600 hover:text-blue-800 p-1 rounded hover:bg-blue-50"
                           title="Edit"
                         >
                           <Edit2 className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => handleDelete(customer.id)}
-                          className="text-red-600 hover:text-red-800"
+                          className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50"
                           title="Delete"
                         >
                           <Trash2 className="h-4 w-4" />

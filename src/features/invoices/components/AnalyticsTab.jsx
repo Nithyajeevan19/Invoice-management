@@ -1,16 +1,19 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { Receipt, TrendingUp, TrendingDown, DollarSign, Users, Package, AlertCircle, Calendar } from 'lucide-react';
+import { 
+  Receipt, TrendingUp, TrendingDown, DollarSign, Users, 
+  Package, AlertCircle, Calendar, Zap, PieChart as PieChartIcon 
+} from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { format, subDays, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
-import { selectAllInvoices, selectInvoiceAnalytics } from '../invoiceSelectors';
+import { selectAllInvoices } from '../invoiceSelectors';
 
 const AnalyticsTab = () => {
   const invoices = useSelector(selectAllInvoices);
-  const analytics = useSelector(selectInvoiceAnalytics);
-  const products = useSelector((state) => state.products.products);
-  const customers = useSelector((state) => state.customers.customers);
-  const payments = useSelector((state) => state.payments?.payments || []);
+  // const analytics = useSelector(selectInvoiceAnalytics);
+  // const products = useSelector((state) => state.products.products);
+  // const customers = useSelector((state) => state.customers.customers);
+  // const payments = useSelector((state) => state.payments?.payments || []);
 
 
   // ============ CALCULATIONS ============
@@ -184,52 +187,175 @@ const AnalyticsTab = () => {
       </div>
 
       {/* Charts Row 1 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Revenue Trend */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Revenue Trend (Last 30 Days)</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={revenueTrend}>
-              <defs>
-                <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis dataKey="date" stroke="#6b7280" style={{ fontSize: '12px' }} />
-              <YAxis stroke="#6b7280" style={{ fontSize: '12px' }} />
-              <Tooltip 
-                contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
-                formatter={(value) => [`₹${value.toFixed(2)}`, 'Revenue']}
-              />
-              <Area type="monotone" dataKey="revenue" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorRevenue)" />
-            </AreaChart>
-          </ResponsiveContainer>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Revenue Trend - Wider (2/3) */}
+        <div className="lg:col-span-2 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-slate-100 p-6 flex flex-col">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <div>
+              <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-indigo-600" />
+                Revenue Trend
+              </h3>
+              <p className="text-sm text-slate-500 mt-0.5">Performance over the last 30 days</p>
+            </div>
+            
+            <div className="flex gap-4">
+              <div className="text-right">
+                <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Avg Daily</p>
+                <p className="text-sm font-bold text-slate-900">₹{(revenueTrend.reduce((s, d) => s + d.revenue, 0) / 30).toFixed(0)}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Peak Day</p>
+                <p className="text-sm font-bold text-emerald-600">₹{Math.max(...revenueTrend.map(d => d.revenue)).toFixed(0)}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex-1 min-h-[300px]">
+            {revenueTrend.some(d => d.revenue > 0) ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={revenueTrend} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#6366f1" stopOpacity={0.15}/>
+                      <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis 
+                    dataKey="date" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fill: '#94a3b8', fontSize: 11 }} 
+                    interval={5}
+                  />
+                  <YAxis 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fill: '#94a3b8', fontSize: 11 }}
+                    tickFormatter={(val) => `₹${val >= 1000 ? (val/1000).toFixed(0)+'k' : val}`}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                      borderRadius: '12px', 
+                      border: 'none', 
+                      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' 
+                    }}
+                    formatter={(value) => [`₹${value.toLocaleString()}`, 'Revenue']}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="revenue" 
+                    stroke="#6366f1" 
+                    strokeWidth={3} 
+                    fillOpacity={1} 
+                    fill="url(#revenueGradient)"
+                    animationDuration={1500}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-full flex flex-col items-center justify-center text-center p-8 bg-slate-50/50 rounded-xl border border-dashed border-slate-200">
+                <div className="bg-white p-3 rounded-full shadow-sm mb-4">
+                  <TrendingUp className="h-6 w-6 text-slate-300" />
+                </div>
+                <h4 className="font-bold text-slate-900">Insufficient Data</h4>
+                <p className="text-sm text-slate-500 mt-1 max-w-[240px]">
+                  Upload more invoices to unlock revenue forecasting and trend insights.
+                </p>
+                <button className="mt-4 text-xs font-bold text-indigo-600 hover:text-indigo-700">
+                  + Add New Invoice
+                </button>
+              </div>
+            )}
+          </div>
+          
+          {revenueTrend.some(d => d.revenue > 0) && (
+            <div className="mt-4 pt-4 border-t border-slate-50">
+              <p className="text-xs text-slate-500 flex items-center gap-2">
+                <Zap className="h-3 w-3 text-amber-500" />
+                <span className="font-medium text-slate-700">Insight:</span>
+                {monthlyGrowth > 0 
+                  ? `Revenue is up ${monthlyGrowth}% compared to last month. Growth is currently stable.`
+                  : "Revenue trend detected. Consider increasing customer outreach to boost month-over-month volume."
+                }
+              </p>
+            </div>
+          )}
         </div>
 
-        {/* Revenue by Status */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Revenue by Status</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={revenueByStatus}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                outerRadius={100}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {revenueByStatus.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip formatter={(value) => `₹${value.toFixed(2)}`} />
-            </PieChart>
-          </ResponsiveContainer>
+        {/* Revenue by Status - Compact (1/3) */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-slate-100 p-6 flex flex-col">
+          <h3 className="text-xl font-bold text-slate-900 mb-1">Revenue Mix</h3>
+          <p className="text-sm text-slate-500 mb-6">Distribution by status</p>
+          
+          <div className="flex-1 relative min-h-[200px]">
+            {revenueByStatus.length > 0 ? (
+              <>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={revenueByStatus}
+                      innerRadius={65}
+                      outerRadius={85}
+                      paddingAngle={5}
+                      dataKey="value"
+                      animationDuration={1000}
+                    >
+                      {revenueByStatus.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value) => `₹${value.toLocaleString()}`} />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <p className="text-[10px] font-black uppercase text-slate-400">Total</p>
+                  <p className="text-lg font-bold text-slate-900">₹{(totalRevenue/1000).toFixed(1)}k</p>
+                </div>
+              </>
+            ) : (
+              <div className="h-full flex flex-col items-center justify-center text-center">
+                <div className="w-24 h-24 rounded-full border-4 border-slate-50 flex items-center justify-center mb-4">
+                  <PieChartIcon className="h-8 w-8 text-slate-200" />
+                </div>
+                <p className="text-xs text-slate-400 font-medium">No revenue data found</p>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-6 space-y-3">
+            {revenueByStatus.map((status, i) => (
+              <div key={i} className="flex items-center justify-between text-sm">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: status.color }}></div>
+                  <span className="text-slate-600 font-medium">{status.name}</span>
+                </div>
+                <div className="text-right">
+                  <span className="font-bold text-slate-900">₹{(status.value/1000).toFixed(1)}k</span>
+                  <span className="text-[10px] text-slate-400 ml-2">({((status.value/totalRevenue)*100).toFixed(0)}%)</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {totalRevenue > 0 && (
+            <div className="mt-6 pt-4 border-t border-slate-50">
+              <div className="bg-indigo-50/50 rounded-xl p-3">
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-[10px] font-bold text-indigo-700 uppercase">Collection Efficiency</span>
+                  <span className="text-xs font-black text-indigo-700">{((paidAmount/totalRevenue)*100).toFixed(0)}%</span>
+                </div>
+                <div className="w-full bg-indigo-100 rounded-full h-1.5">
+                  <div 
+                    className="bg-indigo-600 h-1.5 rounded-full transition-all duration-1000" 
+                    style={{ width: `${(paidAmount/totalRevenue)*100}%` }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

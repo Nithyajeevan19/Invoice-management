@@ -73,27 +73,27 @@ const EmailModal = ({ invoice, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 md:p-0">
+      <div className="bg-white rounded-xl md:rounded-lg shadow-xl max-w-md w-full md:mx-4 max-h-[90vh] overflow-y-auto md:my-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Mail className="h-6 w-6 text-blue-600" />
+        <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-200 sticky top-0 bg-white">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0">
+              <Mail className="h-5 md:h-6 w-5 md:w-6 text-blue-600" />
             </div>
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">Send Invoice</h2>
-              <p className="text-sm text-gray-500">Invoice #{invoice.serialNumber}</p>
+            <div className="min-w-0">
+              <h2 className="text-lg md:text-xl font-semibold text-gray-900 truncate">Send Invoice</h2>
+              <p className="text-xs md:text-sm text-gray-500 truncate">Invoice #{invoice.serialNumber}</p>
             </div>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-            <X className="h-6 w-6" />
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 flex-shrink-0 p-1">
+            <X className="h-5 md:h-6 w-5 md:w-6" />
           </button>
         </div>
 
         {/* Demo Mode Warning */}
-        <div className="mx-6 mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg flex items-start gap-2">
-          <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+        <div className="mx-3 md:mx-6 mt-3 md:mt-4 p-2 md:p-3 bg-yellow-50 border border-yellow-200 rounded-lg flex items-start gap-2">
+          <AlertCircle className="h-4 md:h-5 w-4 md:w-5 text-yellow-600 mt-0.5 flex-shrink-0" />
           <div className="text-xs text-yellow-800">
             <p className="font-semibold">Demo Mode Active</p>
             <p>Email functionality is simulated. To enable real emails, configure EmailJS.</p>
@@ -101,17 +101,17 @@ const EmailModal = ({ invoice, onClose }) => {
         </div>
 
         {/* Body */}
-        <div className="p-6 space-y-4">
+        <div className="p-4 md:p-6 space-y-3 md:space-y-4">
           {/* Error Message */}
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
+            <div className="p-2 md:p-3 bg-red-50 border border-red-200 rounded-lg text-xs md:text-sm text-red-800">
               {error}
             </div>
           )}
 
           {/* Customer Email */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
               Customer Email <span className="text-red-500">*</span>
             </label>
             <input
@@ -122,70 +122,70 @@ const EmailModal = ({ invoice, onClose }) => {
                 setFormData(prev => ({ ...prev, email: e.target.value }));
                 setError('');
               }}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 md:py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm md:text-base"
               placeholder="customer@example.com"
             />
           </div>
 
           {/* Subject */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
               Subject
             </label>
             <input
               type="text"
               value={formData.subject}
               onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 md:py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm md:text-base"
             />
           </div>
 
           {/* Message */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
               Message
             </label>
             <textarea
               value={formData.message}
               onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
               rows="4"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 md:py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm md:text-base resize-none"
             />
           </div>
 
           {/* Invoice Preview Info */}
-          <div className="bg-gray-50 rounded-lg p-4">
-            <p className="text-sm text-gray-600 mb-2">Invoice Details:</p>
-            <p className="text-sm"><strong>Customer:</strong> {invoice.customerName}</p>
-            <p className="text-sm"><strong>Amount:</strong> ₹{invoice.totalAmount?.toFixed(2)}</p>
-            <p className="text-sm"><strong>Date:</strong> {invoice.date}</p>
-            <p className="text-sm"><strong>Attachment:</strong> Invoice PDF will be attached</p>
+          <div className="bg-gray-50 rounded-lg p-3 md:p-4">
+            <p className="text-xs md:text-sm text-gray-600 mb-2 font-medium">Invoice Details:</p>
+            <p className="text-xs md:text-sm"><strong>Customer:</strong> {invoice.customerName}</p>
+            <p className="text-xs md:text-sm"><strong>Amount:</strong> ₹{invoice.totalAmount?.toFixed(2)}</p>
+            <p className="text-xs md:text-sm"><strong>Date:</strong> {invoice.date}</p>
+            <p className="text-xs md:text-sm"><strong>Attachment:</strong> Invoice PDF will be attached</p>
           </div>
 
           {/* Buttons */}
-          <div className="flex gap-3 pt-4">
+          <div className="flex gap-3 pt-2 md:pt-4">
             <button
               type="button"
               onClick={onClose}
               disabled={sending}
-              className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50"
+              className="flex-1 px-4 py-2 md:py-2.5 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 text-sm md:text-base font-medium"
             >
               Cancel
             </button>
             <button
               onClick={handleSend}
               disabled={sending || !formData.email}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2 md:py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2 text-sm md:text-base font-medium"
             >
               {sending ? (
                 <>
                   <Loader className="h-4 w-4 animate-spin" />
-                  Sending...
+                  <span className="hidden sm:inline">Sending...</span>
                 </>
               ) : (
                 <>
                   <Send className="h-4 w-4" />
-                  Send Invoice
+                  <span className="hidden sm:inline">Send Invoice</span>
                 </>
               )}
             </button>

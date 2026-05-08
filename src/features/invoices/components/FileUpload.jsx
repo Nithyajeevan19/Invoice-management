@@ -171,16 +171,16 @@ const FileUpload = () => {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-6">
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Upload Invoice Files</h2>
-        <p className="text-gray-600 mb-6">
+    <div className="w-full max-w-4xl mx-auto p-3 md:p-6">
+      <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
+        <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-2 md:mb-4">Upload Invoice Files</h2>
+        <p className="text-sm md:text-base text-gray-600 mb-4 md:mb-6">
           Upload Excel files (.xlsx, .xls), PDF documents, or images (JPEG, PNG, WEBP)
         </p>
 
         {/* Drag & Drop Area */}
         <div
-          className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all ${
+          className={`relative border-2 border-dashed rounded-lg p-4 md:p-8 text-center transition-all ${
             dragActive
               ? 'border-blue-500 bg-blue-50'
               : 'border-gray-300 hover:border-gray-400'
@@ -199,48 +199,48 @@ const FileUpload = () => {
             className="hidden"
           />
 
-          <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+          <Upload className="mx-auto h-10 md:h-12 w-10 md:w-12 text-gray-400 mb-3 md:mb-4" />
 
-          <p className="text-lg font-medium text-gray-700 mb-2">
+          <p className="text-base md:text-lg font-medium text-gray-700 mb-2">
             Drag and drop files here
           </p>
-          <p className="text-sm text-gray-500 mb-4">or</p>
+          <p className="text-xs md:text-sm text-gray-500 mb-3 md:mb-4">or</p>
 
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            className="px-4 md:px-6 py-2 md:py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm md:text-base"
             disabled={processing}
           >
             Browse Files
           </button>
 
-          <p className="text-xs text-gray-400 mt-4">
+          <p className="text-xs text-gray-400 mt-3 md:mt-4">
             Supported: Excel (.xlsx, .xls), PDF, Images (JPEG, PNG, WEBP)
           </p>
         </div>
 
         {/* Selected Files List */}
         {selectedFiles.length > 0 && (
-          <div className="mt-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-3">
+          <div className="mt-4 md:mt-6">
+            <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-3">
               Selected Files ({selectedFiles.length})
             </h3>
             <div className="space-y-2">
               {selectedFiles.map((file, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-md"
+                  className="flex items-center justify-between p-2 md:p-3 bg-gray-50 rounded-md"
                 >
-                  <div className="flex items-center space-x-3">
-                    <File className="h-5 w-5 text-blue-600" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-700">{file.name}</p>
+                  <div className="flex items-center space-x-2 md:space-x-3 min-w-0">
+                    <File className="h-5 w-5 text-blue-600 flex-shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-xs md:text-sm font-medium text-gray-700 truncate">{file.name}</p>
                       <p className="text-xs text-gray-500">{formatFileSize(file.size)}</p>
                     </div>
                   </div>
                   <button
                     onClick={() => removeFile(index)}
-                    className="text-red-500 hover:text-red-700"
+                    className="text-red-500 hover:text-red-700 flex-shrink-0 ml-2"
                     disabled={processing}
                   >
                     <X className="h-5 w-5" />
@@ -252,7 +252,7 @@ const FileUpload = () => {
             <button
               onClick={handleUpload}
               disabled={processing}
-              className="mt-4 w-full px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
+              className="mt-3 md:mt-4 w-full px-4 md:px-6 py-3 bg-green-600 text-white text-sm md:text-base rounded-md hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
             >
               {processing ? 'Processing...' : `Upload ${selectedFiles.length} File(s)`}
             </button>
@@ -261,10 +261,10 @@ const FileUpload = () => {
 
         {/* Processing Status */}
         {processing && (
-          <div className="mt-6 p-4 bg-blue-50 rounded-md">
+          <div className="mt-4 md:mt-6 p-3 md:p-4 bg-blue-50 rounded-md">
             <div className="flex items-center mb-2">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-3"></div>
-              <span className="text-sm font-medium text-blue-800">{currentStatus}</span>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-2 md:mr-3"></div>
+              <span className="text-xs md:text-sm font-medium text-blue-800 truncate">{currentStatus}</span>
             </div>
             <div className="w-full bg-blue-200 rounded-full h-2">
               <div

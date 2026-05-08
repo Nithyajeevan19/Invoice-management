@@ -36,3 +36,310 @@ body {
     opacity: 0.8;
   }
 }
+
+/* ============ RESPONSIVE TYPOGRAPHY & SPACING ============ */
+@media (max-width: 768px) {
+  h1 {
+    font-size: clamp(1.25rem, 5vw, 2rem);
+  }
+
+  h2 {
+    font-size: clamp(1.1rem, 4vw, 1.5rem);
+  }
+
+  h3 {
+    font-size: clamp(1rem, 3.5vw, 1.25rem);
+  }
+
+  p {
+    font-size: clamp(0.875rem, 2.5vw, 1rem);
+  }
+
+  /* ============ MOBILE CONTAINER PADDING ============ */
+  .p-6 {
+    padding: clamp(0.75rem, 3vw, 1.5rem) !important;
+  }
+
+  .px-6 {
+    padding-left: clamp(0.5rem, 3vw, 1.5rem) !important;
+    padding-right: clamp(0.5rem, 3vw, 1.5rem) !important;
+  }
+
+  .py-6 {
+    padding-top: clamp(0.5rem, 2vw, 1.5rem) !important;
+    padding-bottom: clamp(0.5rem, 2vw, 1.5rem) !important;
+  }
+
+  .px-4 {
+    padding-left: clamp(0.5rem, 2vw, 1rem) !important;
+    padding-right: clamp(0.5rem, 2vw, 1rem) !important;
+  }
+
+  .py-4 {
+    padding-top: clamp(0.5rem, 1.5vw, 1rem) !important;
+    padding-bottom: clamp(0.5rem, 1.5vw, 1rem) !important;
+  }
+
+  /* ============ TABLES → CARD LAYOUT ============ */
+  table {
+    display: block;
+    border: none !important;
+    width: 100%;
+  }
+
+  thead {
+    display: none;
+  }
+
+  tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  tbody tr {
+    display: block;
+    background: white;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin: 0 !important;
+  }
+
+  tbody td {
+    display: block;
+    padding: 0.5rem 0 !important;
+    border: none !important;
+    text-align: right;
+    background: transparent;
+  }
+
+  tbody td::before {
+    content: attr(data-label);
+    float: left;
+    font-weight: 600;
+    color: #6b7280;
+    text-align: left;
+  }
+
+  /* Alternative: Use nth-child if data-label not available */
+  tbody td:nth-child(1)::before { content: "Status"; }
+  tbody td:nth-child(2)::before { content: "Invoice #"; }
+  tbody td:nth-child(3)::before { content: "Customer"; }
+  tbody td:nth-child(4)::before { content: "Products"; }
+  tbody td:nth-child(5)::before { content: "Qty"; }
+  tbody td:nth-child(6)::before { content: "Tax"; }
+  tbody td:nth-child(7)::before { content: "Total"; }
+  tbody td:nth-child(8)::before { content: "Date"; }
+  tbody td:nth-child(9)::before { content: "Actions"; }
+
+  tbody tr.hover\:bg-gray-50:hover {
+    background-color: white;
+  }
+
+  /* ============ ACTION BUTTONS - MOBILE ============ */
+  .flex.space-x-2 {
+    gap: 0.5rem;
+    justify-content: flex-end;
+  }
+
+  .flex.space-x-2 button {
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem !important;
+  }
+
+  /* ============ MODALS → BOTTOM SHEET ============ */
+  .fixed.inset-0.bg-black {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 40;
+  }
+
+  .fixed.inset-0 > div:not(.bg-black) {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    max-height: 90vh !important;
+    border-radius: 1rem 1rem 0 0 !important;
+    margin: 0 !important;
+    animation: slideUpMobile 0.3s ease-out forwards;
+  }
+
+  @keyframes slideUpMobile {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  /* ============ GRID LAYOUTS → VERTICAL STACK ============ */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr !important;
+  }
+
+  .grid-cols-1 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .grid-cols-2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .grid-cols-3 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .grid-cols-4 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .gap-6 {
+    gap: clamp(0.5rem, 2vw, 1.5rem) !important;
+  }
+
+  .gap-4 {
+    gap: clamp(0.5rem, 1.5vw, 1rem) !important;
+  }
+
+  /* ============ RESPONSIVE FLEX WRAP ============ */
+  .flex {
+    flex-wrap: wrap;
+  }
+
+  .flex-1 {
+    flex: 1 1 100% !important;
+  }
+
+  .flex-row {
+    flex-direction: column !important;
+  }
+
+  /* ============ BUTTON SIZING - TOUCH TARGETS ============ */
+  button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* ============ INPUT & SELECT SIZING ============ */
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  /* ============ HORIZONTAL SCROLLABLE CARDS (Snap Scroll) ============ */
+  .snap-scroll-container {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .snap-scroll-item {
+    flex: 0 0 calc(100vw - 2rem);
+    scroll-snap-align: start;
+    scroll-behavior: smooth;
+  }
+
+  /* ============ MINIMIZE MAX-WIDTH ON MOBILE ============ */
+  .max-w-7xl {
+    max-width: 100% !important;
+  }
+
+  .max-w-4xl {
+    max-width: 100% !important;
+  }
+
+  .max-w-md {
+    max-width: 100% !important;
+  }
+
+  .max-w-2xl {
+    max-width: 100% !important;
+  }
+
+  /* ============ HIDDEN ELEMENTS ON MOBILE ============ */
+  .hidden.md\:flex {
+    display: none !important;
+  }
+
+  .md\:flex {
+    display: none !important;
+  }
+
+  .md\:hidden {
+    display: block !important;
+  }
+
+  /* ============ TRUNCATE & ELLIPSIS ============ */
+  .truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ============ RESPONSIVE BORDER & SHADOW ============ */
+  .shadow-md {
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+  }
+
+  /* ============ UPI QR CODE MIN SIZE ============ */
+  .upi-qr-code,
+  [class*="qr"],
+  [class*="QR"] {
+    min-width: 200px !important;
+    min-height: 200px !important;
+    width: 200px !important;
+    height: 200px !important;
+  }
+
+  /* ============ EXPORT BUTTON ============ */
+  .flex.justify-end {
+    flex-direction: column !important;
+  }
+
+  .flex.justify-end > button {
+    width: 100% !important;
+  }
+
+  /* ============ SEARCH & FILTER BAR ============ */
+  .flex.gap-2 > input,
+  .flex.gap-2 > select,
+  .flex.gap-3 > input,
+  .flex.gap-3 > select {
+    width: 100% !important;
+  }
+
+  /* ============ FORM FIELDS FULL WIDTH ============ */
+  .w-full {
+    width: 100% !important;
+  }
+
+  .min-w-\[200px\] {
+    min-width: 100% !important;
+  }
+
+  /* ============ CHART RESPONSIVENESS ============ */
+  svg[width] {
+    width: 100% !important;
+  }
+
+  /* ============ STICKY CONTENT PADDING ============ */
+  [class*="pb-24"] {
+    padding-bottom: 6rem !important; /* Account for bottom tab bar (5.5rem) */
+  }
+}

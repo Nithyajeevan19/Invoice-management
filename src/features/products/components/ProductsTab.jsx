@@ -62,38 +62,38 @@ const ProductsTab = () => {
   }
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-hidden">
       
       <button
         onClick={() => exportToExcel(products, "products_export.xlsx", "Products")}
-        className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 ml-2"
+        className="flex items-center justify-center md:justify-start px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 mb-3 md:mb-4 w-full md:w-auto text-sm md:text-base"
       >
-        <Download className="h-5 w-5 mr-1" />
+        <Download className="h-4 md:h-5 w-4 md:w-5 mr-1 md:mr-2" />
         Export to Excel
       </button>
 
-      <table className="min-w-full bg-white border border-gray-200 rounded-lg">
+      <table className="w-full bg-white border border-gray-200 rounded-lg overflow-hidden text-sm md:text-base">
         <thead className="bg-gray-100">
           <tr>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+            <th className="px-3 md:px-4 py-2 md:py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
               Name
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+            <th className="px-3 md:px-4 py-2 md:py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
               Quantity
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+            <th className="px-3 md:px-4 py-2 md:py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
               Unit Price
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+            <th className="px-3 md:px-4 py-2 md:py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
               Tax
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+            <th className="px-3 md:px-4 py-2 md:py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
               Price with Tax
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+            <th className="px-3 md:px-4 py-2 md:py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
               Discount
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+            <th className="px-3 md:px-4 py-2 md:py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
               Actions
             </th>
           </tr>
@@ -109,116 +109,116 @@ const ProductsTab = () => {
                 className={`hover:bg-gray-50 ${hasValidationErrors(product) ? 'bg-red-50' : ''}`}
               >
                 {/* Name */}
-                <td className={`px-4 py-3 ${isFieldMissing(product, 'name') ? 'validation-error' : ''}`}>
+                <td className={`px-3 md:px-4 py-2 md:py-3 ${isFieldMissing(product, 'name') ? 'validation-error' : ''}`}>
                   {isEditing ? (
                     <input
                       type="text"
                       value={currentData.name}
                       onChange={(e) => handleEditChange('name', e.target.value)}
-                      className="border rounded px-2 py-1 w-full"
+                      className="border rounded px-2 py-1 w-full text-sm"
                     />
                   ) : (
-                    <span className="font-medium text-gray-900">
+                    <span className="font-medium text-gray-900 text-sm">
                       {product.name || <span className="validation-missing">Missing ⚠️</span>}
                     </span>
                   )}
                 </td>
 
                 {/* Quantity */}
-                <td className={`px-4 py-3 ${isFieldMissing(product, 'quantity') ? 'validation-error' : ''}`}>
+                <td className={`px-3 md:px-4 py-2 md:py-3 ${isFieldMissing(product, 'quantity') ? 'validation-error' : ''}`}>
                   {isEditing ? (
                     <input
                       type="number"
                       value={currentData.quantity}
                       onChange={(e) => handleEditChange('quantity', parseFloat(e.target.value))}
-                      className="border rounded px-2 py-1 w-24"
+                      className="border rounded px-2 py-1 w-20 text-sm"
                     />
                   ) : (
-                    <span className="text-gray-900">
+                    <span className="text-gray-900 text-sm">
                       {product.quantity || <span className="validation-missing">Missing ⚠️</span>}
                     </span>
                   )}
                 </td>
 
                 {/* Unit Price */}
-                <td className={`px-4 py-3 ${isFieldMissing(product, 'unitPrice') ? 'validation-error' : ''}`}>
+                <td className={`px-3 md:px-4 py-2 md:py-3 ${isFieldMissing(product, 'unitPrice') ? 'validation-error' : ''}`}>
                   {isEditing ? (
                     <input
                       type="number"
                       step="0.01"
                       value={currentData.unitPrice}
                       onChange={(e) => handleEditChange('unitPrice', parseFloat(e.target.value))}
-                      className="border rounded px-2 py-1 w-24"
+                      className="border rounded px-2 py-1 w-20 text-sm"
                     />
                   ) : (
-                    <span className="text-gray-900">
+                    <span className="text-gray-900 text-sm">
                       {product.unitPrice ? `₹${product.unitPrice.toFixed(2)}` : <span className="validation-missing">Missing ⚠️</span>}
                     </span>
                   )}
                 </td>
 
                 {/* Tax */}
-                <td className="px-4 py-3">
+                <td className="px-3 md:px-4 py-2 md:py-3">
                   {isEditing ? (
                     <input
                       type="number"
                       step="0.01"
                       value={currentData.tax}
                       onChange={(e) => handleEditChange('tax', parseFloat(e.target.value))}
-                      className="border rounded px-2 py-1 w-24"
+                      className="border rounded px-2 py-1 w-20 text-sm"
                     />
                   ) : (
-                    <span className="text-gray-900">₹{product.tax?.toFixed(2) || '0.00'}</span>
+                    <span className="text-gray-900 text-sm">₹{product.tax?.toFixed(2) || '0.00'}</span>
                   )}
                 </td>
 
                 {/* Price with Tax */}
-                <td className="px-4 py-3">
+                <td className="px-3 md:px-4 py-2 md:py-3">
                   {isEditing ? (
                     <input
                       type="number"
                       step="0.01"
                       value={currentData.priceWithTax}
                       onChange={(e) => handleEditChange('priceWithTax', parseFloat(e.target.value))}
-                      className="border rounded px-2 py-1 w-24"
+                      className="border rounded px-2 py-1 w-20 text-sm"
                     />
                   ) : (
-                    <span className="font-semibold text-gray-900">
+                    <span className="font-semibold text-gray-900 text-sm">
                       ₹{product.priceWithTax?.toFixed(2) || '0.00'}
                     </span>
                   )}
                 </td>
 
                 {/* Discount */}
-                <td className="px-4 py-3">
+                <td className="px-3 md:px-4 py-2 md:py-3">
                   {isEditing ? (
                     <input
                       type="number"
                       step="0.01"
                       value={currentData.discount || 0}
                       onChange={(e) => handleEditChange('discount', parseFloat(e.target.value))}
-                      className="border rounded px-2 py-1 w-24"
+                      className="border rounded px-2 py-1 w-20 text-sm"
                     />
                   ) : (
-                    <span className="text-gray-600">₹{product.discount?.toFixed(2) || '0.00'}</span>
+                    <span className="text-gray-600 text-sm">₹{product.discount?.toFixed(2) || '0.00'}</span>
                   )}
                 </td>
 
                 {/* Actions */}
-                <td className="px-4 py-3">
-                  <div className="flex space-x-2">
+                <td className="px-2 md:px-4 py-2 md:py-3">
+                  <div className="flex space-x-1 md:space-x-2">
                     {isEditing ? (
                       <>
                         <button
                           onClick={saveEdit}
-                          className="text-green-600 hover:text-green-800"
+                          className="text-green-600 hover:text-green-800 p-1 rounded hover:bg-green-50"
                           title="Save"
                         >
                           <Save className="h-4 w-4" />
                         </button>
                         <button
                           onClick={cancelEdit}
-                          className="text-gray-600 hover:text-gray-800"
+                          className="text-gray-600 hover:text-gray-800 p-1 rounded hover:bg-gray-50"
                           title="Cancel"
                         >
                           <X className="h-4 w-4" />
@@ -228,14 +228,14 @@ const ProductsTab = () => {
                       <>
                         <button
                           onClick={() => startEdit(product)}
-                          className="text-blue-600 hover:text-blue-800"
+                          className="text-blue-600 hover:text-blue-800 p-1 rounded hover:bg-blue-50"
                           title="Edit"
                         >
                           <Edit2 className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => handleDelete(product.id)}
-                          className="text-red-600 hover:text-red-800"
+                          className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50"
                           title="Delete"
                         >
                           <Trash2 className="h-4 w-4" />

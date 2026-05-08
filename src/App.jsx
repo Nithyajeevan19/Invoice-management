@@ -10,16 +10,16 @@ import PaymentsTab from './features/payments/components/PaymentsTab';
 import AIInsights from './features/invoices/components/AIInsights';
 import Auth from './features/auth/Auth';
 import ResetPassword from './features/auth/ResetPassword';
-import { supabase } from './lib/supabase';
-import { signOut } from './services/auth/authService';
-import toast from 'react-hot-toast';
+// import { supabase } from './lib/supabase';
+// import { signOut } from './services/auth/authService';
+// import toast from 'react-hot-toast';
 import './index.css';
 
 const App = () => {
   const [activeTab, setActiveTab] = useState('upload');
-  const [session, setSession] = useState(null);
+  // const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isResettingPassword, setIsResettingPassword] = useState(false);
+  // const [isResettingPassword, setIsResettingPassword] = useState(false);
 
   useEffect(() => {
     // Check initial session
@@ -41,19 +41,14 @@ const App = () => {
     return () => subscription.unsubscribe();
     */
     setLoading(false);
-    setSession({ user: { email: 'demo@example.com' } });
+    // setSession({ user: { email: 'demo@example.com' } });
   }, []);
 
+  /*
   const handleLogout = async () => {
-    /*
-    const { error } = await signOut();
-    if (error) {
-      toast.error(error.message);
-    } else {
-      toast.success("Logged out successfully");
-    }
-    */
+    // ...
   };
+  */
 
   const tabs = [
     { id: 'upload', label: 'Upload Files', icon: FileText },
@@ -93,7 +88,7 @@ const App = () => {
   */
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 pb-24 md:pb-0">
         <Toaster
           position="top-right"
           toastOptions={{
@@ -120,14 +115,14 @@ const App = () => {
         />
 
         {/* Header */}
-        <header className="bg-white shadow-md">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <header className="bg-white shadow-md sticky top-0 z-40 md:relative">
+          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 md:py-6">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">
-                  Invoice Management System
+                <h1 className="text-xl md:text-3xl font-bold text-gray-900">
+                  Invoice Management
                 </h1>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="hidden md:block text-sm text-gray-600 mt-1">
                   AI-Powered Data Extraction & Management
                 </p>
               </div>
@@ -157,8 +152,8 @@ const App = () => {
           </div>
         </header>
 
-        {/* Tab Navigation */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        {/* Tab Navigation - Desktop */}
+        <div className="hidden md:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="border-b border-gray-200">
               <nav className="flex -mb-px" aria-label="Tabs">
@@ -188,7 +183,7 @@ const App = () => {
               </nav>
             </div>
 
-            {/* Tab Content */}
+            {/* Tab Content Desktop */}
             <div className="p-6">
               {activeTab === 'upload' && <FileUpload />}
               {activeTab === 'invoices' && <InvoicesTab />}
@@ -201,9 +196,49 @@ const App = () => {
           </div>
         </div>
 
+        {/* Tab Content Mobile */}
+        <div className="md:hidden p-3 mb-2">
+          {activeTab === 'upload' && <FileUpload />}
+          {activeTab === 'invoices' && <InvoicesTab />}
+          {activeTab === 'products' && <ProductsTab />}
+          {activeTab === 'customers' && <CustomersTab />}
+          {activeTab === 'analytics' && <AnalyticsTab />}  
+          {activeTab === 'payments' && <PaymentsTab />}
+          {activeTab === 'ai-insights' && <AIInsights />}
+        </div>
+
+        {/* Tab Navigation - Mobile Sticky Bottom Bar */}
+        <nav className="fixed md:hidden bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-2xl z-50" aria-label="Mobile Tabs">
+          <div className="flex justify-around">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`
+                    flex-1 py-3 px-2 text-center transition-all duration-200 flex flex-col items-center justify-center gap-1
+                    ${
+                      isActive
+                        ? 'text-indigo-600 bg-indigo-50'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }
+                  `}
+                  title={tab.label}
+                >
+                  <Icon className="h-5 w-5" />
+                  <span className="text-xs font-medium truncate">{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </nav>
+
         {/* Footer */}
-        <footer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-12">
-          <div className="text-center text-sm text-gray-600">
+        <footer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8 mt-8 md:mt-12">
+          <div className="text-center text-xs md:text-sm text-gray-600">
             <p>Done By Nithyajeevan</p>
             <p className="mt-1">© 2025 Invoice Management System</p>
           </div>

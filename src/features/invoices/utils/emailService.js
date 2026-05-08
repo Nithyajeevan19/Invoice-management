@@ -69,7 +69,7 @@ export const sendPaymentReminder = async (invoice, customerEmail, daysOverdue = 
       ? `Payment reminder for Invoice #${invoice.serialNumber} (${daysOverdue} days overdue)`
       : `Payment reminder for Invoice #${invoice.serialNumber}`;
 
-    console.log('⏰ [EmailService] Payment Reminder Sent:', { to: customerEmail, invoiceId: invoice.serialNumber });
+    console.log('⏰ [EmailService] Payment Reminder Sent:', { to: customerEmail, invoiceId: invoice.serialNumber, message });
 
     return {
       success: true,

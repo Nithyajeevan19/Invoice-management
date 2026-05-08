@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
 });
 
 export const PdfInvoice = ({ invoice, company }) => {
-  const { serialNumber, date, customerName, products, taxBreakdown = {}, totalAmount = 0, address, gstin, ...rest } = invoice;
+  const { serialNumber, date, customerName, products, taxBreakdown = {}, totalAmount = 0, address, gstin } = invoice;
   const { cgst = 0, sgst = 0, igst = 0, totalTax = 0 } = taxBreakdown;
   // Example: get date as "12 Nov 2024"
   let displayDate = date ? new Date(date).toLocaleDateString("en-GB", { year: "numeric", month: "short", day: "numeric" }) : "";
